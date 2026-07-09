@@ -11,8 +11,10 @@ Fictional crime drama in the tradition of Taiwanese gangster films (Monga, Gatao
 
 - React 19 + Vite + TypeScript
 - Tailwind CSS v4 (`@theme` tokens in `src/index.css`, no config file)
-- OpenRouter API for dynamic NPC dialogue (default model: `anthropic/claude-sonnet-4.6`)
-- Pure client-side SPA — no backend, no database, no localStorage; all state lives in a React reducer
+- OpenRouter API for dynamic NPC dialogue (default model: `deepseek/deepseek-v4-flash`)
+- Upstash Redis (via Vercel Marketplace) + one Vercel serverless function for the global leaderboard
+- Manga-style illustrated scenes and character portraits (`src/assets/`), three-track MP3 soundtrack (`public/audio/`)
+- Game state is a single React reducer — no localStorage, every run starts fresh
 
 ## Run it
 
@@ -22,38 +24,56 @@ cp .env.local.example .env.local   # add your OpenRouter key
 npm run dev
 ```
 
-No key? The game still runs in **offline mode**: NPCs answer with scripted fallback lines and each exchange grants +8 trust so every act gate stays passable. A badge on the conversation panel shows which mode you're in.
+No key? The game still runs in **offline mode**: NPCs answer with scripted fallback lines and each exchange grants +8 trust so every act gate stays passable. A badge on the conversation panel shows which mode you're in. (The leaderboard needs the Upstash env vars — see below — and silently shows "unreachable" without them.)
 
 ## Config knobs (`src/config.ts`)
 
-- `DEFAULT_MODEL` — swap to `anthropic/claude-haiku-4.5` or an open model for cheaper testing
+- `DEFAULT_MODEL` — any OpenRouter model id
 - `MAX_TOKENS` / `TEMPERATURE` / `HISTORY_WINDOW` — per-call cost bounds
-- `OFFLINE_TRUST_DELTA` — trust granted per exchange without a key
+- `OFFLINE_TRUST_DELTA` / `API_FAIL_TRUST_DELTA` — trust granted per exchange when the AI is unavailable, so outages can't strand a run
 
 ## How it's wired
 
 ```
+api/
+  leaderboard.ts         Vercel serverless function — GET top scores, POST a run.
 src/
   api/openrouter.ts      callOpenRouter() — every NPC call funnels here.
-                         Requests strict JSON {dialogue, trust_delta, mood},
-                         retries once on garbage, then falls back in character.
+                         Requests strict JSON {dialogue, trust_delta, mood,
+                         charm_delta, rep_delta, heat_delta}, retries once on
+                         garbage, then falls back in character.
+  hooks/
+    useBackgroundMusic.ts Looping soundtrack with per-act track switching and
+                         self-healing resume (autoplay policy, media keys).
   game/
     gameState.ts         Reducer + context: stats, NPC trust/history, flags, act gating.
-    characters.ts        The five NPCs: system prompts, colors, fallback lines.
+    characters.ts        The five NPCs: system prompts, portraits, hints, fallback lines.
     acts/act1..5.ts      Scene scripts as node graphs (narration | line | choice |
                          ai | effects | gate | allyCheck | endAct).
   components/            DialogueBox, ChoiceList, AIConversation, StatBar,
-                         SceneBackground, TrustMeter, ActTransition, EndingCard.
+                         SceneBackground, TrustMeter, ActTransition, EndingCard,
+                         Leaderboard.
 ```
 
-Player stats: **Cash** (NT$), **Reputation** (unlocks act gates), **Charm** (unlocks dialogue options), **Heat** (≥70 triggers shakedown events).
+Player stats: **Cash** (NT$, leaderboard rank), **Reputation**, **Charm**, **Heat**. Scripted choices move them — and so does the AI: every chat line is judged for small charm/rep/heat deltas alongside trust.
 
-Act gates: Act 1 — Long's trust ≥ 50 · Act 2 — Tsai's trust ≥ 55 · Act 3 — Reputation ≥ 50 (makeup runs loop until you clear it) · Act 4 — at least one ally · Act 5 — endings branch on final stats: **Bloody Coup**, **Negotiated Succession**, or **Betrayed and Cast Out**.
+Trust gates per encounter: Ah-Mei 30 → Long 35 → Tsai 55 → Long 70 → Long 90 → Hsu 60 / Ah-Mei 50 / Long 100 (Act 4) → Kuo 100. Failing a gate shows a low-trust notice and reopens the conversation. Endings branch on final stats: **Bloody Coup**, **Negotiated Succession**, or **Betrayed and Cast Out**.
+
+## Leaderboard
+
+Global, ranked by **cash**, with rep/charm/heat recorded alongside. Visible from the title screen (排行榜 button) and the ending screen, where you can carve your name after a run.
+
+How it works:
+
+- **Storage:** an Upstash Redis sorted set (key `lb`), provisioned free through the Vercel Marketplace and attached to this project. Score = cash; the member is a JSON blob `{n, c, r, ch, h, e, t}` (name, cash, rep, charm, heat, ending id, timestamp). The set is trimmed to the top 500 on every write.
+- **API:** `api/leaderboard.ts`, one serverless endpoint. `GET` returns the top 50 (client shows 10). `POST` validates and clamps input (name ≤ 20 chars, HTML stripped, numbers bounded) and `ZADD`s the entry. Reads the `KV_REST_API_URL` / `KV_REST_API_TOKEN` env vars that the Upstash integration injects.
+- **Client:** `src/components/Leaderboard.tsx` — one shared panel; the ending screen passes `allowSubmit` to add the name form.
+- **Honesty note:** scores are submitted from the browser, so they're spoofable with dev tools. It's a fun-run leaderboard, not an anti-cheat system.
 
 ## Art
 
-Backgrounds are gradient + giant-glyph placeholders. Each scene's `BackgroundSpec` (in the act files) accepts an `imageUrl` — drop in real illustrations per scene and they render as full-bleed panels with the same vignette.
+13 illustrated scene backgrounds and 5 character portraits live in `src/assets/`, wired via `imageUrl` on each scene's `BackgroundSpec` and `portraitUrl` on each character. Portraits render as a centered card while that character speaks. Prompts used to generate the full set are in `ART-PROMPTS.md`.
 
 ## Deploy
 
-Static build, deploys anywhere: `npm run build` → `dist/`. On Vercel, set `VITE_OPENROUTER_API_KEY` in project env settings. Note: a client-side key is visible to players — for a public link, either ship offline mode or set a spend limit on the key.
+Push to `main` — Vercel builds from GitHub (static SPA + the `api/` function). Env needed in Vercel: `VITE_OPENROUTER_API_KEY` (baked client-side at build time) plus the Upstash vars, which the marketplace integration manages automatically. Note: a client-side key is visible to players — set a spend limit on it.
