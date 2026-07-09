@@ -2,7 +2,7 @@
  * Central knobs. Swap DEFAULT_MODEL to a cheaper model during testing, e.g.
  * 'anthropic/claude-haiku-4.5' or an open model on OpenRouter.
  */
-export const DEFAULT_MODEL = 'anthropic/claude-sonnet-4.6'
+export const DEFAULT_MODEL = 'meta-llama/llama-3.3-70b-instruct:free'
 export const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
 export const MAX_TOKENS = 200
 export const TEMPERATURE = 0.8
