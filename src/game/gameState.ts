@@ -165,6 +165,11 @@ export function reducer(state: GameState, action: Action): GameState {
       const npc = state.npcs[action.character]
       return {
         ...state,
+        stats: applyEffects(state.stats, {
+          charm: action.reply.charm_delta ?? 0,
+          reputation: action.reply.rep_delta ?? 0,
+          heat: action.reply.heat_delta ?? 0,
+        }),
         npcs: {
           ...state.npcs,
           [action.character]: {

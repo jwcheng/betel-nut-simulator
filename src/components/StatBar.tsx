@@ -28,7 +28,13 @@ function Stat({
   )
 }
 
-export function StatBar() {
+export function StatBar({
+  muted,
+  onToggleMute,
+}: {
+  muted: boolean
+  onToggleMute: () => void
+}) {
   const { state } = useGame()
   const { cash, reputation, charm, heat } = state.stats
   const act = state.act
@@ -40,6 +46,14 @@ export function StatBar() {
           第{['一', '二', '三', '四', '五'][act - 1]}幕
         </div>
         <div className="flex items-center gap-2 sm:gap-4">
+          <button
+            type="button"
+            onClick={onToggleMute}
+            title={muted ? 'Unmute music' : 'Mute music'}
+            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-white/15 text-[11px] text-white/70 transition-colors hover:border-neon-pink/60 hover:text-white"
+          >
+            {muted ? '🔇' : '🔊'}
+          </button>
           <Stat label="Cash" zh="現金" value={`NT$${cash.toLocaleString()}`} accent="#7ddf9a" />
           <Stat label="Rep" zh="聲望" value={String(reputation)} accent="#d4af37" />
           <Stat label="Charm" zh="魅力" value={String(charm)} accent="#ff6fa5" />

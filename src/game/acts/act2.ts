@@ -1,4 +1,7 @@
 import type { ActDefinition } from '../../types/game'
+import roadImg from '../../assets/backgrounds/road.jpeg'
+import farmImg from '../../assets/backgrounds/farm.jpeg'
+import shedImg from '../../assets/backgrounds/shed.jpeg'
 
 export const act2: ActDefinition = {
   id: 2,
@@ -14,15 +17,18 @@ export const act2: ActDefinition = {
       gradient: 'linear-gradient(180deg, #1a1a10 0%, #2e2c14 60%, #4a4520 100%)',
       glyph: '南',
       label: 'Provincial Highway 1 · southbound',
+      imageUrl: roadImg,
     },
     farm: {
       gradient: 'linear-gradient(180deg, #22260f 0%, #3a4018 55%, #6b5b1f 100%)',
       glyph: '園',
       label: 'Binnan Township · 檳南鎮',
+      imageUrl: farmImg,
     },
     shed: {
       gradient: 'linear-gradient(180deg, #241a0c 0%, #45300f 60%, #6b4a17 100%)',
       glyph: '工',
+      imageUrl: shedImg,
       label: 'The packing shed',
     },
   },

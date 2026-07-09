@@ -1,4 +1,7 @@
 import type { ActDefinition } from '../../types/game'
+import officeImg from '../../assets/backgrounds/office.jpeg'
+import teahouseImg from '../../assets/backgrounds/teahouse.jpeg'
+import stand2Img from '../../assets/backgrounds/stand2.jpeg'
 
 export const act4: ActDefinition = {
   id: 4,
@@ -14,15 +17,18 @@ export const act4: ActDefinition = {
       gradient: 'linear-gradient(180deg, #120a0e 0%, #26101c 55%, #4a1428 100%)',
       glyph: '派',
       label: 'The route captain’s office · Sanchong',
+      imageUrl: officeImg,
     },
     teahouse: {
       gradient: 'linear-gradient(180deg, #150d08 0%, #2e1710 60%, #521f14 100%)',
       glyph: '茶',
       label: 'The Golden Crane tea house · private room',
+      imageUrl: teahouseImg,
     },
     stand2: {
       gradient: 'linear-gradient(180deg, #150a1e 0%, #33102e 50%, #7a1244 100%)',
       glyph: '檳',
+      imageUrl: stand2Img,
       label: 'Twin Star №3 · Ah-Mei’s corner',
     },
   },
@@ -85,6 +91,13 @@ export const act4: ActDefinition = {
       minTurns: 2,
       exitLabel: 'Finish the tea',
       next: 'ahmei_intro',
+      gate: { minTrust: 60, failNext: 'hsu_lowtrust' },
+    },
+    hsu_lowtrust: {
+      id: 'hsu_lowtrust',
+      kind: 'narration',
+      text: '信任不足 — not enough trust. Hsu’s smile stays exactly where it is, but the offer stays in his pocket. He needs 60 trust before he talks real numbers. Keep talking.',
+      next: 'hsu_talk',
     },
     ahmei_intro: {
       id: 'ahmei_intro',
@@ -108,6 +121,13 @@ export const act4: ActDefinition = {
       minTurns: 2,
       exitLabel: 'Buy the pack and go',
       next: 'ahmei_ally_check',
+      gate: { minTrust: 50, failNext: 'ahmei4_lowtrust' },
+    },
+    ahmei4_lowtrust: {
+      id: 'ahmei4_lowtrust',
+      kind: 'narration',
+      text: '信任不足 — not enough trust. Ah-Mei rings up your pack and says nothing worth hearing. Her girls’ eyes cost 50 trust. Keep talking.',
+      next: 'ahmei_talk4',
     },
     ahmei_ally_check: {
       id: 'ahmei_ally_check',
@@ -140,6 +160,13 @@ export const act4: ActDefinition = {
       minTurns: 2,
       exitLabel: 'Let him read you',
       next: 'long_ally_check',
+      gate: { minTrust: 100, failNext: 'long4_lowtrust' },
+    },
+    long4_lowtrust: {
+      id: 'long4_lowtrust',
+      kind: 'narration',
+      text: '信任不足 — not enough trust. Long flicks his cigarette and looks back at the loading crews. For this question he needs everything — 100 trust. Keep talking.',
+      next: 'long_talk4',
     },
     long_ally_check: {
       id: 'long_ally_check',

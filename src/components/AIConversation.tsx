@@ -13,14 +13,11 @@ export function AIConversation({ node }: { node: AINode }) {
 
   const [input, setInput] = useState('')
   const [pending, setPending] = useState<string | null>(null)
+  const [statFx, setStatFx] = useState<{ label: string; bad: boolean }[]>([])
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  // player turns taken inside THIS conversation node (history persists across scenes)
-  const [baselineTurns] = useState(
-    () => npc.history.filter((m) => m.role === 'user').length,
-  )
-  const turns = npc.history.filter((m) => m.role === 'user').length - baselineTurns
-  const canExit = turns >= node.minTurns && pending === null
+  // no minimum-exchange requirement — the trust gates are the only doors
+  const canExit = pending === null
 
   useEffect(() => {
     dispatch({ type: 'NPC_OPENER', character: node.character, opener: node.opener, nodeId: node.id })
@@ -47,6 +44,12 @@ export function AIConversation({ node }: { node: AINode }) {
       sceneContext,
     )
     dispatch({ type: 'NPC_TURN', character: node.character, playerMessage: text, reply })
+    const fx: { label: string; bad: boolean }[] = []
+    const sign = (n: number) => (n > 0 ? `+${n}` : `${n}`)
+    if (reply.charm_delta) fx.push({ label: `${sign(reply.charm_delta)} Charm`, bad: reply.charm_delta < 0 })
+    if (reply.rep_delta) fx.push({ label: `${sign(reply.rep_delta)} Rep`, bad: reply.rep_delta < 0 })
+    if (reply.heat_delta) fx.push({ label: `${sign(reply.heat_delta)} Heat`, bad: reply.heat_delta > 0 })
+    setStatFx(fx)
     setPending(null)
   }
 
@@ -60,11 +63,29 @@ export function AIConversation({ node }: { node: AINode }) {
   }
 
   return (
-    <div className="flex w-full flex-col rounded-xl border border-white/10 bg-noir-900/92 shadow-[0_8px_40px_rgba(0,0,0,0.6)] backdrop-blur-md">
-      {/* header */}
-      <div className="flex items-center gap-3 border-b border-white/10 px-3 py-2">
-        <Portrait id={character.id} mood={npc.mood} size={44} />
-        <div className="min-w-0 flex-1">
+    <div className="flex w-full flex-col overflow-hidden rounded-xl border border-white/10 bg-noir-900/92 shadow-[0_8px_40px_rgba(0,0,0,0.6)] backdrop-blur-md">
+      {/* header, with character art as a backdrop */}
+      <div className="relative flex items-center gap-3 border-b border-white/10 px-3 py-2">
+        {character.portraitUrl && (
+          <>
+            <img
+              src={character.portraitUrl}
+              alt=""
+              aria-hidden
+              className="absolute inset-0 h-full w-full object-cover object-top opacity-35"
+            />
+            <div
+              className="absolute inset-0"
+              style={{
+                background: `linear-gradient(90deg, ${character.color}33 0%, rgba(7,7,15,0.9) 65%, rgba(7,7,15,0.96) 100%)`,
+              }}
+            />
+          </>
+        )}
+        <div className="relative z-10">
+          <Portrait id={character.id} mood={npc.mood} size={44} />
+        </div>
+        <div className="relative z-10 min-w-0 flex-1">
           <div className="flex items-baseline gap-2">
             <span className="font-display text-sm font-bold" style={{ color: character.color }}>
               {character.name}
@@ -76,7 +97,10 @@ export function AIConversation({ node }: { node: AINode }) {
               </span>
             )}
           </div>
-          <TrustMeter trust={npc.trust} mood={npc.mood} />
+          <TrustMeter trust={npc.trust} mood={npc.mood} target={node.gate?.minTrust} />
+          <p className="mt-0.5 text-[10px] italic leading-tight text-white/45">
+            {character.hint}
+          </p>
         </div>
       </div>
 
@@ -119,6 +143,24 @@ export function AIConversation({ node }: { node: AINode }) {
         )}
       </div>
 
+      {/* stat effects from the last exchange */}
+      {statFx.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 px-3 pb-1">
+          {statFx.map((f) => (
+            <span
+              key={f.label}
+              className={`animate-rise rounded-full border px-2 py-0.5 text-[10px] font-bold ${
+                f.bad
+                  ? 'border-neon-red/60 text-neon-red'
+                  : 'border-gold-throne/60 text-gold-throne'
+              }`}
+            >
+              {f.label}
+            </span>
+          ))}
+        </div>
+      )}
+
       {/* suggestions */}
       <div className="flex flex-wrap gap-1.5 px-3 pb-2">
         {node.suggestions.map((s) => (
@@ -158,11 +200,9 @@ export function AIConversation({ node }: { node: AINode }) {
           type="button"
           onClick={exit}
           disabled={!canExit}
-          title={canExit ? undefined : `Keep talking (${turns}/${node.minTurns} exchanges)`}
           className="rounded-lg border border-white/20 px-3 py-2 text-xs text-white/80 transition-all hover:border-gold-throne hover:text-gold-throne disabled:opacity-30"
         >
           {node.exitLabel}
-          {!canExit && ` (${turns}/${node.minTurns})`}
         </button>
       </div>
     </div>

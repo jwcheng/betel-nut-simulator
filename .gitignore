@@ -24,3 +24,9 @@ dist-ssr
 *.sw?
 
 .vercel
+
+.vercel
+.env*
+
+# original audio sources; encoded copies live in public/audio
+/*.mp3

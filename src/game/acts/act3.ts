@@ -1,4 +1,7 @@
 import type { ActDefinition } from '../../types/game'
+import highwayImg from '../../assets/backgrounds/highway.jpeg'
+import reststopImg from '../../assets/backgrounds/reststop.jpeg'
+import warehouseImg from '../../assets/backgrounds/warehouse.jpeg'
 
 export const act3: ActDefinition = {
   id: 3,
@@ -14,15 +17,18 @@ export const act3: ActDefinition = {
       gradient: 'linear-gradient(180deg, #05060d 0%, #0e1526 55%, #1d2b4a 100%)',
       glyph: '路',
       label: 'Provincial Highway 1 · northbound, 2 a.m.',
+      imageUrl: highwayImg,
     },
     reststop: {
       gradient: 'linear-gradient(180deg, #0c0a14 0%, #221230 55%, #4a1a3c 100%)',
       glyph: '站',
       label: 'Highway rest stop · sodium lights',
+      imageUrl: reststopImg,
     },
     warehouse: {
       gradient: 'linear-gradient(180deg, #0a0a14 0%, #181a2e 60%, #2a2545 100%)',
       glyph: '倉',
+      imageUrl: warehouseImg,
       label: 'The Sanchong warehouse',
     },
   },
@@ -50,6 +56,13 @@ export const act3: ActDefinition = {
       minTurns: 1,
       exitLabel: 'Take the keys',
       next: 'run1_intro',
+      gate: { minTrust: 70, failNext: 'long_check1_lowtrust' },
+    },
+    long_check1_lowtrust: {
+      id: 'long_check1_lowtrust',
+      kind: 'narration',
+      text: '信任不足 — not enough trust. Long doesn’t hand the keys over. He needs 70 trust before you drive his cargo. Keep talking.',
+      next: 'long_check1',
     },
     run1_intro: {
       id: 'run1_intro',
@@ -283,6 +296,13 @@ export const act3: ActDefinition = {
       minTurns: 2,
       exitLabel: 'Finish the noodles',
       next: 'a3_end_fx',
+      gate: { minTrust: 90, failNext: 'long_final_lowtrust' },
+    },
+    long_final_lowtrust: {
+      id: 'long_final_lowtrust',
+      kind: 'narration',
+      text: '信任不足 — not enough trust. Long goes quiet and orders more noodles. A man doesn’t share the top of the mountain with someone he trusts less than 90. Keep talking.',
+      next: 'long_final',
     },
     a3_end_fx: {
       id: 'a3_end_fx',

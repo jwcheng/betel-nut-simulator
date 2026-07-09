@@ -19,6 +19,10 @@ export interface NPCReply {
   dialogue: string
   trust_delta: number
   mood: Mood
+  /** small AI-judged stat nudges from the player's line (usually 0) */
+  charm_delta?: number
+  rep_delta?: number
+  heat_delta?: number
 }
 
 export interface NPCState {
@@ -37,6 +41,9 @@ export interface Character {
   systemPrompt: string
   fallbackLines: string[]
   initialTrust: number
+  portraitUrl?: string
+  /** player-facing tell: what earns trust with this character, what burns it */
+  hint: string
 }
 
 export interface BackgroundSpec {

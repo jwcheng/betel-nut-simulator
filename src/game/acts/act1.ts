@@ -1,4 +1,7 @@
 import type { ActDefinition } from '../../types/game'
+import streetImg from '../../assets/backgrounds/street.jpeg'
+import standImg from '../../assets/backgrounds/stand.jpeg'
+import alleyImg from '../../assets/backgrounds/alley.jpeg'
 
 export const act1: ActDefinition = {
   id: 1,
@@ -14,15 +17,18 @@ export const act1: ActDefinition = {
       gradient: 'linear-gradient(180deg, #0d0d1d 0%, #16162e 55%, #3d1030 100%)',
       glyph: '夜',
       label: 'Wanxia District · 11:47 PM',
+      imageUrl: streetImg,
     },
     stand: {
       gradient: 'linear-gradient(180deg, #150a1e 0%, #33102e 50%, #7a1244 100%)',
       glyph: '檳',
       label: 'Twin Star Betel Nut · 雙星檳榔',
+      imageUrl: standImg,
     },
     alley: {
       gradient: 'linear-gradient(180deg, #0a0a14 0%, #1c1226 60%, #3a1030 100%)',
       glyph: '巷',
+      imageUrl: alleyImg,
       label: 'The alley behind the stand',
     },
   },
@@ -85,6 +91,20 @@ export const act1: ActDefinition = {
       minTurns: 2,
       exitLabel: 'Pay and step back',
       next: 'after_ahmei',
+      gate: { minTrust: 30, failNext: 'ahmei_brush' },
+    },
+    ahmei_brush: {
+      id: 'ahmei_brush',
+      kind: 'line',
+      speaker: 'ahmei',
+      text: '哎唷, that all you got, 帥哥? The glass is thick but it isn’t THAT thick. Try talking to me like a person.',
+      next: 'ahmei_brush2',
+    },
+    ahmei_brush2: {
+      id: 'ahmei_brush2',
+      kind: 'narration',
+      text: 'She turns to restock a shelf, but there’s no real dismissal in it. The neon hums. The night is long, and so is her patience — barely.',
+      next: 'ahmei_talk',
     },
     after_ahmei: {
       id: 'after_ahmei',
@@ -122,7 +142,13 @@ export const act1: ActDefinition = {
       minTurns: 3,
       exitLabel: 'Wait for his verdict',
       next: 'long_invite',
-      gate: { minTrust: 50, failNext: 'long_reject' },
+      gate: { minTrust: 35, failNext: 'long_lowtrust' },
+    },
+    long_lowtrust: {
+      id: 'long_lowtrust',
+      kind: 'narration',
+      text: '信任不足 — not enough trust. Long studies you like unfinished paperwork. He needs 35 trust before this goes anywhere. The conversation isn’t over.',
+      next: 'long_talk',
     },
     long_reject: {
       id: 'long_reject',

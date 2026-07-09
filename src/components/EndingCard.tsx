@@ -1,4 +1,5 @@
 import { useGame } from '../game/gameState'
+import { LeaderboardPanel } from './Leaderboard'
 
 const ENDING_GRADIENTS: Record<string, string> = {
   coup: 'linear-gradient(160deg, #0d0304 0%, #3a0a10 55%, #6e1016 100%)',
@@ -69,6 +70,8 @@ export function EndingCard() {
             ))}
           </ul>
         </div>
+
+        <LeaderboardPanel allowSubmit className="mt-8" />
 
         <button
           type="button"

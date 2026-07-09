@@ -14,13 +14,20 @@
   --color-gold-throne: #d4af37;
 
   --font-display: "Noto Serif TC", "PMingLiU", serif;
-  --font-body: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+  /* Latin font first: CJK fonts render ’ and “” full-width, which reads as
+     stray spaces inside English words. CJK glyphs fall through to Noto. */
+  --font-body: system-ui, "Segoe UI", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
 
+  --animate-fade: fade 2.2s ease-out both;
   --animate-flicker: flicker 4s infinite;
   --animate-blink: blink 1.2s step-end infinite;
   --animate-rise: rise 0.35s ease-out;
   --animate-heat-pulse: heat-pulse 1.4s ease-in-out infinite;
 
+  @keyframes fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
   @keyframes flicker {
     0%, 100% { opacity: 1; }
     3% { opacity: 0.6; }
@@ -63,6 +70,14 @@ body {
     0 0 6px rgba(255, 45, 120, 0.9),
     0 0 20px rgba(255, 45, 120, 0.6),
     0 0 48px rgba(255, 45, 120, 0.35);
+}
+
+/* warm gold glow for the dusk title screen */
+.gold-text {
+  text-shadow:
+    0 0 6px rgba(232, 163, 61, 0.9),
+    0 0 20px rgba(212, 175, 55, 0.6),
+    0 0 48px rgba(212, 175, 55, 0.35);
 }
 
 .gold-text {

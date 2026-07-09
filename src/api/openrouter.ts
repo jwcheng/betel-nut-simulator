@@ -1,4 +1,5 @@
 import {
+  API_FAIL_TRUST_DELTA,
   DEFAULT_MODEL,
   HISTORY_WINDOW,
   MAX_TOKENS,
@@ -44,11 +45,16 @@ Cash NT$${stats.cash.toLocaleString()}, gang reputation ${stats.reputation}/100,
 
 RULES:
 - Stay in character. Never mention being an AI or a game.
-- Reply in English, sprinkled with Traditional Chinese or Taiwanese phrases where natural.
+- Reply in ENGLISH. You may sprinkle in AT MOST one or two short Traditional Chinese or Taiwanese words per reply (e.g. 哎唷, 兄弟, 少年仔) for flavor — NEVER write a full Chinese sentence or clause. English speakers must understand every reply completely without translation.
+- If the player asks you to speak English (or says they don't understand Chinese), drop the Chinese words entirely and reply in plain English from then on.
 - 1 to 4 sentences MAXIMUM. Punchy, filmic visual-novel dialogue, not prose.
-- Judge the player's line: raise trust_delta for lines that fit what you respect, lower it for lines you despise. Range -10 to +10, usually -5 to +5.
+- Judge the player's line and set trust_delta. A sincere, in-character line that fits what you respect earns +5 to +9. A passable line earns +1 to +3. But you are MOODY: lazy, repetitive, evasive, or try-hard lines COST trust (-2 to -5), and lines you genuinely despise cost -6 to -10. Let your mood swing visibly — flash suspicious or hostile the moment something lands wrong, warm quickly when something lands right.
+- Also judge small stat effects, each -3 to +3 and usually 0 — set them ONLY when the line clearly earns it:
+  charm_delta: wit, smoothness, magnetism earn +1 to +3; awkward or cringeworthy lines -1 to -2.
+  rep_delta: spine, street-smart moves, keeping face earn +1 to +3; grovelling or losing face -1 to -2.
+  heat_delta: reckless talk (naming crimes aloud, threats, bragging where ears might hear) +1 to +3; deliberate discretion at a tense moment -1.
 - Respond with ONLY a minified JSON object, no markdown fences, exactly this shape:
-{"dialogue":"...","trust_delta":0,"mood":"friendly|neutral|suspicious|hostile|impressed"}`
+{"dialogue":"...","trust_delta":0,"mood":"friendly|neutral|suspicious|hostile|impressed","charm_delta":0,"rep_delta":0,"heat_delta":0}`
 }
 
 function parseReply(raw: string): NPCReply | null {
@@ -58,12 +64,18 @@ function parseReply(raw: string): NPCReply | null {
   try {
     const obj = JSON.parse(raw.slice(start, end + 1)) as Record<string, unknown>
     if (typeof obj.dialogue !== 'string' || obj.dialogue.length === 0) return null
-    const delta = Number(obj.trust_delta)
+    const num = (v: unknown, lo: number, hi: number) => {
+      const n = Number(v)
+      return Number.isFinite(n) ? Math.max(lo, Math.min(hi, Math.round(n))) : 0
+    }
     const mood = VALID_MOODS.includes(obj.mood as Mood) ? (obj.mood as Mood) : 'neutral'
     return {
       dialogue: obj.dialogue,
-      trust_delta: Number.isFinite(delta) ? Math.max(-10, Math.min(10, Math.round(delta))) : 0,
+      trust_delta: num(obj.trust_delta, -10, 10),
       mood,
+      charm_delta: num(obj.charm_delta, -3, 3),
+      rep_delta: num(obj.rep_delta, -3, 3),
+      heat_delta: num(obj.heat_delta, -3, 3),
     }
   } catch {
     return null
@@ -78,7 +90,7 @@ function fallbackReply(character: Character, trust: number, offline: boolean): N
   const mood: Mood = trust >= 60 ? 'friendly' : trust >= 35 ? 'neutral' : 'suspicious'
   return {
     dialogue: character.fallbackLines[i % character.fallbackLines.length],
-    trust_delta: offline ? OFFLINE_TRUST_DELTA : 0,
+    trust_delta: offline ? OFFLINE_TRUST_DELTA : API_FAIL_TRUST_DELTA,
     mood,
   }
 }

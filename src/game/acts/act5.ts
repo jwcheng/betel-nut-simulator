@@ -1,4 +1,5 @@
 import type { ActDefinition } from '../../types/game'
+import templeImg from '../../assets/backgrounds/temple.jpeg'
 
 export const act5: ActDefinition = {
   id: 5,
@@ -14,6 +15,7 @@ export const act5: ActDefinition = {
       gradient: 'linear-gradient(180deg, #0a0805 0%, #1e1708 55%, #3d2e0c 100%)',
       glyph: '王',
       label: 'Longevity Tea House · the back room',
+      imageUrl: templeImg,
     },
   },
   start: 'a5_intro',
@@ -53,6 +55,13 @@ export const act5: ActDefinition = {
       minTurns: 3,
       exitLabel: 'Make your final move',
       next: 'final_choice',
+      gate: { minTrust: 100, failNext: 'kuo_lowtrust' },
+    },
+    kuo_lowtrust: {
+      id: 'kuo_lowtrust',
+      kind: 'narration',
+      text: '信任不足 — not enough trust. The old man refills your cup without a word. For the chair itself he needs everything you have — 100 trust. The tea isn’t finished.',
+      next: 'kuo_talk',
     },
     final_choice: {
       id: 'final_choice',
