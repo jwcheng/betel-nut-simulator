@@ -1,0 +1,16 @@
+/**
+ * Central knobs. Swap DEFAULT_MODEL to a cheaper model during testing, e.g.
+ * 'anthropic/claude-haiku-4.5' or an open model on OpenRouter.
+ */
+export const DEFAULT_MODEL = 'anthropic/claude-sonnet-4.6'
+export const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
+export const MAX_TOKENS = 200
+export const TEMPERATURE = 0.8
+/** messages of NPC history sent per request (keeps token cost bounded) */
+export const HISTORY_WINDOW = 12
+/**
+ * With no API key the game runs in "offline mode": NPCs answer with scripted
+ * fallback lines and every exchange grants this much trust, so act gates stay
+ * passable during development.
+ */
+export const OFFLINE_TRUST_DELTA = 8
