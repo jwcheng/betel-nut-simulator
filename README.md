@@ -1,5 +1,8 @@
 # 檳榔王國 · Betel Nut Empire
 
+PUBLIC LINK HERE:
+https://betel-nut-simulator.vercel.app/
+
 A browser-based visual novel RPG set in a fictionalized Taiwan. You start as a truck driver, stumble onto a neon-lit betel nut stand in Taipei, and climb a criminal organization across five acts — from the southern farms to the throne itself.
 
 Fictional crime drama in the tradition of Taiwanese gangster films (Monga, Gatao). No real people, gangs, or literal locations.
