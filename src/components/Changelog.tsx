@@ -10,7 +10,7 @@ const RELEASES: Release[] = [
     title: '成交 · A Deal Is a Deal',
     items: [
       'When a character genuinely closes the scene — deal struck, instructions given — trust auto-fills to the gate. No more small-talk grinding after "see you at 3pm"',
-      'Suggestion chips are alive now: use one and the LLM writes a fresh replacement that fits where the conversation actually went',
+      'Suggestion chips are alive now: use one and the LLM writes a fresh replacement that fits where the conversation actually went — always three on deck',
       'Both run on the same reply the character was already sending — zero extra AI calls',
     ],
   },

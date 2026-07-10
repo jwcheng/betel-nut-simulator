@@ -56,15 +56,18 @@ export function AIConversation({ node }: { node: AINode }) {
       secret: secretActive ? { flag: secretActive.id, bonus: secretActive.bonus } : undefined,
       gateTarget: node.gate?.minTrust,
     })
-    // swap the used chip for the model's fresh suggestion
-    if (usedChip) {
-      setChips((prev) => {
-        const fresh = (reply.suggestion ?? '').trim()
-        const next = prev.filter((c) => c !== usedChip)
-        if (fresh.length > 4 && !next.includes(fresh)) next.push(fresh)
-        return next
-      })
-    }
+    // keep exactly 3 chips alive: drop the used one, prefer the model's fresh
+    // suggestion, and recycle originals if the fresh one is empty/duplicate
+    setChips((prev) => {
+      const next = usedChip ? prev.filter((c) => c !== usedChip) : [...prev]
+      const fresh = (reply.suggestion ?? '').trim()
+      if (next.length < 3 && fresh.length > 4 && !next.includes(fresh)) next.push(fresh)
+      for (const orig of node.suggestions) {
+        if (next.length >= 3) break
+        if (!next.includes(orig)) next.push(orig)
+      }
+      return next
+    })
     const fx: { label: string; bad: boolean }[] = []
     const sign = (n: number) => (n > 0 ? `+${n}` : `${n}`)
     if (reply.wrap && node.gate && npc.trust < node.gate.minTrust)
