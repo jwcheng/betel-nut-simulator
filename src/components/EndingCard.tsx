@@ -1,5 +1,60 @@
+import { useState } from 'react'
 import { useGame } from '../game/gameState'
 import { LeaderboardPanel } from './Leaderboard'
+
+const SECRETS: { flag: string; who: string; where: string; secret: string; bonus: number }[] = [
+  { flag: 'sec_a1_ahmei', who: 'Ah-Mei', where: 'Act 1 · the stand', secret: 'A Binnan girl — half her pay goes home to her mother and little brother', bonus: 20 },
+  { flag: 'sec_a1_long', who: 'Long', where: 'Act 1 · the alley', secret: 'He was a nobody driver once — exactly like you', bonus: 20 },
+  { flag: 'sec_a2_tsai', who: 'Tsai', where: 'Act 2 · the shed', secret: 'He shorts the shipments to survive Kuo’s rising quotas', bonus: 20 },
+  { flag: 'sec_a3_route', who: 'Long', where: 'Act 3 · the warehouse', secret: 'The route was open because the last driver talked at a rest stop', bonus: 20 },
+  { flag: 'sec_a3_throne', who: 'Long', where: 'Act 3 · the noodle stall', secret: 'Kuo offered him the throne once. He refused it', bonus: 24 },
+  { flag: 'sec_a4_hsu', who: 'Hsu', where: 'Act 4 · the tea house', secret: 'No trucks of his own — you were the leverage all along', bonus: 20 },
+  { flag: 'sec_a4_ledger', who: 'Ah-Mei', where: 'Act 4 · Twin Star №3', secret: 'Years of plates and faces, written down. Insurance', bonus: 20 },
+  { flag: 'sec_a4_condition', who: 'Long', where: 'Act 4 · the warehouse', secret: 'Protect the farms and drivers — or he removes you himself', bonus: 24 },
+  { flag: 'sec_a4_kaoliang', who: 'Long', where: 'Act 4 · drinks', secret: 'The northern kaoliang he poured the night the last succession failed', bonus: 16 },
+  { flag: 'sec_a4_crates', who: 'Ah-Mei', where: 'Act 4 · her corner', secret: 'Kuo’s own men, moving crates out before dawn', bonus: 16 },
+  { flag: 'sec_a4_clause', who: 'Hsu', where: 'Act 4 · tea, again', secret: 'The clause: your drivers answer to his cousin the day after', bonus: 16 },
+  { flag: 'sec_a5_kuo', who: 'Kuo', where: 'Act 5 · the back room', secret: 'The three before you lied. He only ever wanted to be let go', bonus: 30 },
+]
+
+function SecretsTable() {
+  const { state } = useGame()
+  const [open, setOpen] = useState(false)
+  const found = SECRETS.filter((s) => state.flags[s.flag]).length
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="mt-6 text-[10px] tracking-wide text-white/30 transition-colors hover:text-gold-throne/80"
+      >
+        🔍 你知道全部了嗎？ · you found {found} of {SECRETS.length} secrets — see them all
+      </button>
+    )
+  }
+
+  return (
+    <div className="mt-6 w-full rounded-xl border border-white/10 bg-black/40 p-4 text-left backdrop-blur-sm">
+      <h3 className="font-display text-sm font-bold tracking-widest text-white/70">
+        秘密 · The Secrets ({found}/{SECRETS.length} uncovered)
+      </h3>
+      <ul className="mt-3 space-y-2">
+        {SECRETS.map((s) => {
+          const got = Boolean(state.flags[s.flag])
+          return (
+            <li key={s.flag} className="text-[11px] leading-relaxed">
+              <span className={got ? 'text-gold-throne' : 'text-white/35'}>
+                {got ? '✓' : '·'} <b>{s.who}</b> <span className="text-white/30">({s.where}, +{s.bonus})</span>
+              </span>{' '}
+              <span className={got ? 'text-white/75' : 'text-white/40'}>{s.secret}</span>
+            </li>
+          )
+        })}
+      </ul>
+    </div>
+  )
+}
 
 const ENDING_GRADIENTS: Record<string, string> = {
   coup: 'linear-gradient(160deg, #0d0304 0%, #3a0a10 55%, #6e1016 100%)',
@@ -72,6 +127,8 @@ export function EndingCard() {
         </div>
 
         <LeaderboardPanel allowSubmit className="mt-8" />
+
+        <SecretsTable />
 
         <button
           type="button"
