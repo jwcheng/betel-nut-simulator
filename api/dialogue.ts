@@ -1,5 +1,12 @@
 import { Redis } from '@upstash/redis'
-import { DEFAULT_MODEL, MAX_TOKENS, OPENROUTER_URL, TEMPERATURE } from '../src/config'
+
+// Defined here, not imported: Vercel functions can't resolve modules outside
+// api/ at runtime (ERR_MODULE_NOT_FOUND). Keep DEFAULT_MODEL in sync with the
+// display copy in src/config.ts.
+const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
+const DEFAULT_MODEL = 'deepseek/deepseek-v4-flash'
+const MAX_TOKENS = 200
+const TEMPERATURE = 0.8
 
 const API_KEY = process.env.OPENROUTER_API_KEY
 

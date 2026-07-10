@@ -1,13 +1,10 @@
 /**
- * Central knobs. Swap DEFAULT_MODEL to a cheaper model during testing, e.g.
- * 'anthropic/claude-haiku-4.5' or an open model on OpenRouter.
- * DEFAULT_MODEL, OPENROUTER_URL, MAX_TOKENS, and TEMPERATURE are enforced
- * server-side by api/dialogue.ts — the client never talks to OpenRouter.
+ * Client-side knobs. The model, token, and temperature knobs that govern the
+ * actual OpenRouter call live in api/dialogue.ts (the client never talks to
+ * OpenRouter directly). DEFAULT_MODEL here is the display copy for the
+ * footer — keep it in sync with api/dialogue.ts.
  */
 export const DEFAULT_MODEL = 'deepseek/deepseek-v4-flash'
-export const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
-export const MAX_TOKENS = 200
-export const TEMPERATURE = 0.8
 /** messages of NPC history sent per request (keeps token cost bounded) */
 export const HISTORY_WINDOW = 12
 /**
