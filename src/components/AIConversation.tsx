@@ -14,6 +14,8 @@ export function AIConversation({ node }: { node: AINode }) {
   const [input, setInput] = useState('')
   const [pending, setPending] = useState<string | null>(null)
   const [statFx, setStatFx] = useState<{ label: string; bad: boolean }[]>([])
+  // live suggestion chips: used ones get replaced by fresh AI-written lines
+  const [chips, setChips] = useState<string[]>(node.suggestions)
   const scrollRef = useRef<HTMLDivElement>(null)
 
   // no minimum-exchange requirement — the trust gates are the only doors
@@ -28,7 +30,7 @@ export function AIConversation({ node }: { node: AINode }) {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
   }, [npc.history.length, pending])
 
-  async function send(message: string) {
+  async function send(message: string, usedChip?: string) {
     const text = message.trim()
     if (!text || pending !== null) return
     setInput('')
@@ -52,9 +54,21 @@ export function AIConversation({ node }: { node: AINode }) {
       playerMessage: text,
       reply,
       secret: secretActive ? { flag: secretActive.id, bonus: secretActive.bonus } : undefined,
+      gateTarget: node.gate?.minTrust,
     })
+    // swap the used chip for the model's fresh suggestion
+    if (usedChip) {
+      setChips((prev) => {
+        const fresh = (reply.suggestion ?? '').trim()
+        const next = prev.filter((c) => c !== usedChip)
+        if (fresh.length > 4 && !next.includes(fresh)) next.push(fresh)
+        return next
+      })
+    }
     const fx: { label: string; bad: boolean }[] = []
     const sign = (n: number) => (n > 0 ? `+${n}` : `${n}`)
+    if (reply.wrap && node.gate && npc.trust < node.gate.minTrust)
+      fx.push({ label: `成交 · DEAL SEALED — trust ${node.gate.minTrust}`, bad: false })
     if (reply.secret_hit && secretActive)
       fx.push({ label: `秘密 SECRET UNCOVERED +${secretActive.bonus} trust`, bad: false })
     if (reply.charm_delta) fx.push({ label: `${sign(reply.charm_delta)} Charm`, bad: reply.charm_delta < 0 })
@@ -183,14 +197,14 @@ export function AIConversation({ node }: { node: AINode }) {
         </div>
       )}
 
-      {/* suggestions */}
+      {/* suggestions — each used chip is replaced by a fresh AI-written one */}
       <div className="flex flex-wrap gap-1.5 px-3 pb-2">
-        {node.suggestions.map((s) => (
+        {chips.map((s) => (
           <button
             key={s}
             type="button"
             disabled={pending !== null}
-            onClick={() => send(s)}
+            onClick={() => send(s, s)}
             className="rounded-full border border-white/15 bg-noir-800/80 px-2.5 py-1 text-left text-[11px] text-white/70 transition-colors hover:border-neon-pink/60 hover:text-white disabled:opacity-40"
           >
             {s}

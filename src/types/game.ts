@@ -27,6 +27,10 @@ export interface NPCReply {
   flag?: string
   /** true on the single reply where the encounter's hidden truth is revealed */
   secret_hit?: boolean
+  /** true when the character considers this scene's business genuinely settled */
+  wrap?: boolean
+  /** fresh player-voice suggestion to backfill a used chip */
+  suggestion?: string
 }
 
 export interface NPCState {

@@ -51,6 +51,8 @@ export type Action =
       reply: NPCReply
       /** the node's secret, passed only while still undiscovered */
       secret?: { flag: string; bonus: number }
+      /** the node's gate threshold; a genuine wrap lifts trust to meet it */
+      gateTarget?: number
     }
   | { type: 'ALLY_CHECK'; node: AllyCheckNode }
   | { type: 'END_ACT' }
@@ -196,7 +198,13 @@ export function reducer(state: GameState, action: Action): GameState {
       )
       const secretBonus = secretHit && action.secret ? action.secret.bonus : 0
 
-      const newTrust = clamp100(npc.trust + action.reply.trust_delta + secretBonus)
+      let newTrust = clamp100(npc.trust + action.reply.trust_delta + secretBonus)
+      // the character closed the scene on good terms: the deal itself is the
+      // trust — lift straight to the gate so the player isn't left grinding
+      // small talk after "see you at 3pm"
+      if (action.reply.wrap && action.gateTarget && newTrust < action.gateTarget) {
+        newTrust = clamp100(action.gateTarget)
+      }
       const next: GameState = {
         ...state,
         stats: applyEffects(state.stats, {

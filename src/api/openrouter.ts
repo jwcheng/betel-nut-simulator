@@ -63,8 +63,10 @@ RULES:
   rep_delta: spine, street-smart moves, keeping face earn +1 to +3; grovelling or losing face -1 to -2.
   heat_delta: reckless talk (naming crimes aloud, threats, bragging where ears might hear) +1 to +3; deliberate discretion at a tense moment -1.
 - Content line: this is crime FICTION — scheming, smuggling, in-story threats and power plays are all fair game and must NOT be flagged. But if the player's message crosses real-world lines — explicit sexual content or sexual advances, anything sexual involving minors, graphic gratuitous gore/torture, slurs or hate speech, or reveling in murder in graphic detail — set "flag":"offensive". Otherwise "flag":"".
+- "wrap": set true ONLY when this scene's business is genuinely settled from your side — a deal struck, instructions given, an understanding reached — and you would naturally end the conversation here on good terms. Never wrap in your first couple of replies, never while you still distrust the player, and never as a brush-off.
+- "suggestion": write ONE fresh line the PLAYER could say next — first person, the player's voice, under 120 characters — that would genuinely move THIS conversation somewhere new. Never repeat anything already said or suggested.
 - Respond with ONLY a minified JSON object, no markdown fences, exactly this shape:
-{"dialogue":"...","trust_delta":0,"mood":"friendly|neutral|suspicious|hostile|impressed","charm_delta":0,"rep_delta":0,"heat_delta":0,"flag":"","secret_hit":false}`
+{"dialogue":"...","trust_delta":0,"mood":"friendly|neutral|suspicious|hostile|impressed","charm_delta":0,"rep_delta":0,"heat_delta":0,"flag":"","secret_hit":false,"wrap":false,"suggestion":"..."}`
 }
 
 function parseReply(raw: string): NPCReply | null {
@@ -88,6 +90,8 @@ function parseReply(raw: string): NPCReply | null {
       heat_delta: num(obj.heat_delta, -3, 3),
       flag: obj.flag === 'offensive' ? 'offensive' : '',
       secret_hit: obj.secret_hit === true,
+      wrap: obj.wrap === true,
+      suggestion: typeof obj.suggestion === 'string' ? obj.suggestion.trim().slice(0, 140) : '',
     }
   } catch {
     return null
