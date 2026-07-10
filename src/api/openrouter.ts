@@ -1,17 +1,26 @@
-import {
-  API_FAIL_TRUST_DELTA,
-  DEFAULT_MODEL,
-  HISTORY_WINDOW,
-  MAX_TOKENS,
-  OFFLINE_TRUST_DELTA,
-  OPENROUTER_URL,
-  TEMPERATURE,
-} from '../config'
+import { API_FAIL_TRUST_DELTA, HISTORY_WINDOW, OFFLINE_TRUST_DELTA } from '../config'
 import type { Character, ChatMessage, Mood, NPCReply, PlayerStats } from '../types/game'
 
-const API_KEY: string | undefined = import.meta.env.VITE_OPENROUTER_API_KEY
+/**
+ * All OpenRouter traffic goes through this serverless proxy — the API key
+ * lives only in the server env (OPENROUTER_API_KEY), never in the bundle.
+ */
+const DIALOGUE_URL = '/api/dialogue'
 
-export const hasApiKey = Boolean(API_KEY)
+let livePromise: Promise<boolean> | null = null
+
+/**
+ * Whether the server has an OpenRouter key configured. Checked once per
+ * session. Under plain `vite` dev there is no /api, so this resolves false —
+ * accurate: that's offline mode (use `vercel dev` for live AI locally).
+ */
+export function checkAiLive(): Promise<boolean> {
+  livePromise ??= fetch(DIALOGUE_URL)
+    .then((res) => (res.ok ? (res.json() as Promise<{ live?: boolean }>) : { live: false }))
+    .then((d) => Boolean(d.live))
+    .catch(() => false)
+  return livePromise
+}
 
 const VALID_MOODS: Mood[] = ['friendly', 'neutral', 'suspicious', 'hostile', 'impressed']
 
@@ -114,9 +123,10 @@ function fallbackReply(character: Character, trust: number, offline: boolean): N
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 /**
- * Single funnel for all NPC dialogue. Calls OpenRouter, expects structured
- * JSON back, retries once on garbage, then falls back to a scripted
- * in-character line. With no API key it runs fully offline.
+ * Single funnel for all NPC dialogue. Calls OpenRouter through the
+ * /api/dialogue proxy, expects structured JSON back, retries once on
+ * garbage, then falls back to a scripted in-character line. With no key
+ * configured server-side it runs fully offline.
  */
 export async function callOpenRouter(
   character: Character,
@@ -127,7 +137,7 @@ export async function callOpenRouter(
   sceneContext: string,
   secretBrief?: string,
 ): Promise<NPCReply> {
-  if (!API_KEY) {
+  if (!(await checkAiLive())) {
     await delay(500)
     return fallbackReply(character, trustScore, true)
   }
@@ -140,14 +150,10 @@ export async function callOpenRouter(
 
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      const res = await fetch(OPENROUTER_URL, {
+      const res = await fetch(DIALOGUE_URL, {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${API_KEY}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: DEFAULT_MODEL,
           messages:
             attempt === 0
               ? messages
@@ -159,15 +165,11 @@ export async function callOpenRouter(
                       'Reminder: respond with ONLY the minified JSON object, nothing else.',
                   },
                 ],
-          max_tokens: MAX_TOKENS,
-          temperature: TEMPERATURE,
         }),
       })
-      if (!res.ok) throw new Error(`OpenRouter ${res.status}`)
-      const data = (await res.json()) as {
-        choices?: { message?: { content?: string } }[]
-      }
-      const content = data.choices?.[0]?.message?.content
+      if (!res.ok) throw new Error(`dialogue proxy ${res.status}`)
+      const data = (await res.json()) as { content?: string }
+      const content = data.content
       if (content) {
         const parsed = parseReply(content)
         if (parsed) return parsed

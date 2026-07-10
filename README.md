@@ -11,8 +11,8 @@ Fictional crime drama in the tradition of Taiwanese gangster films (Monga, Gatao
 
 - React 19 + Vite + TypeScript
 - Tailwind CSS v4 (`@theme` tokens in `src/index.css`, no config file)
-- OpenRouter API for dynamic NPC dialogue (default model: `deepseek/deepseek-v4-flash`)
-- Upstash Redis (via Vercel Marketplace) + one Vercel serverless function for the global leaderboard
+- OpenRouter API for dynamic NPC dialogue (default model: `deepseek/deepseek-v4-flash`), proxied through a serverless function so the key never ships to the browser
+- Upstash Redis (via Vercel Marketplace) + two Vercel serverless functions: the global leaderboard and the rate-limited dialogue proxy
 - Manga-style illustrated scenes and character portraits (`src/assets/`), three-track MP3 soundtrack (`public/audio/`)
 - Game state is a single React reducer — no localStorage, every run starts fresh
 
@@ -20,11 +20,11 @@ Fictional crime drama in the tradition of Taiwanese gangster films (Monga, Gatao
 
 ```bash
 npm install
-cp .env.local.example .env.local   # add your OpenRouter key
-npm run dev
+cp .env.local.example .env.local   # add your OpenRouter key (OPENROUTER_API_KEY)
+vercel dev                         # serves the SPA + the api/ functions
 ```
 
-No key? The game still runs in **offline mode**: NPCs answer with scripted fallback lines and each exchange grants +8 trust so every act gate stays passable. A badge on the conversation panel shows which mode you're in. (The leaderboard needs the Upstash env vars — see below — and silently shows "unreachable" without them.)
+Plain `npm run dev` also works but has no `api/` routes, so it always runs in **offline mode**: NPCs answer with scripted fallback lines and each exchange grants +8 trust so every act gate stays passable. A badge on the conversation panel shows which mode you're in. (The leaderboard needs the Upstash env vars — see below — and silently shows "unreachable" without them.)
 
 ## Config knobs (`src/config.ts`)
 
@@ -37,11 +37,15 @@ No key? The game still runs in **offline mode**: NPCs answer with scripted fallb
 ```
 api/
   leaderboard.ts         Vercel serverless function — GET top scores, POST a run.
+  dialogue.ts            Vercel serverless function — proxies chat completions to
+                         OpenRouter. Holds the API key (server env, never bundled),
+                         pins the model + token caps, validates messages, and
+                         rate-limits per IP (15/min) via the same Upstash Redis.
 src/
-  api/openrouter.ts      callOpenRouter() — every NPC call funnels here.
-                         Requests strict JSON {dialogue, trust_delta, mood,
-                         charm_delta, rep_delta, heat_delta}, retries once on
-                         garbage, then falls back in character.
+  api/openrouter.ts      callOpenRouter() — every NPC call funnels here, via
+                         POST /api/dialogue. Requests strict JSON {dialogue,
+                         trust_delta, mood, charm_delta, rep_delta, heat_delta},
+                         retries once on garbage, then falls back in character.
   hooks/
     useBackgroundMusic.ts Looping soundtrack with per-act track switching and
                          self-healing resume (autoplay policy, media keys).
@@ -78,4 +82,4 @@ How it works:
 
 ## Deploy
 
-Push to `main` — Vercel builds from GitHub (static SPA + the `api/` function). Env needed in Vercel: `VITE_OPENROUTER_API_KEY` (baked client-side at build time) plus the Upstash vars, which the marketplace integration manages automatically. Note: a client-side key is visible to players — set a spend limit on it.
+Push to `main` — Vercel builds from GitHub (static SPA + the `api/` functions). Env needed in Vercel: `OPENROUTER_API_KEY` (server-side only, read by `api/dialogue.ts`) plus the Upstash vars, which the marketplace integration manages automatically. The key never appears in the client bundle; players talk to `/api/dialogue`, which pins the model, caps tokens, and rate-limits per IP. Still worth a spend limit on the key as a backstop.

@@ -6,6 +6,15 @@ interface Release {
 
 const RELEASES: Release[] = [
   {
+    version: 'v0.9',
+    title: '鎖 · The Key Goes in the Vault',
+    items: [
+      'AI dialogue now flows through a server-side proxy — the OpenRouter key no longer ships in the page, so nobody can lift it from the browser',
+      'The proxy pins the model and token caps and rate-limits chatty scripts (15 messages/min per IP) — normal play never notices',
+      'Same characters, same brains, zero gameplay changes',
+    ],
+  },
+  {
     version: 'v0.8',
     title: '成交 · A Deal Is a Deal',
     items: [

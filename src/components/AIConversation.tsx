@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
-import { callOpenRouter, hasApiKey } from '../api/openrouter'
+import { callOpenRouter } from '../api/openrouter'
 import { CHARACTERS } from '../game/characters'
 import { useGame } from '../game/gameState'
+import { useAiLive } from '../hooks/useAiLive'
 import type { AINode } from '../types/game'
 import { Portrait } from './Portrait'
 import { TrustMeter } from './TrustMeter'
 
 export function AIConversation({ node }: { node: AINode }) {
   const { state, dispatch } = useGame()
+  const aiLive = useAiLive()
   const character = CHARACTERS[node.character]
   const npc = state.npcs[node.character]
 
@@ -119,7 +121,7 @@ export function AIConversation({ node }: { node: AINode }) {
               {character.name}
             </span>
             <span className="text-xs text-white/40">{character.nameZh}</span>
-            {!hasApiKey && (
+            {!aiLive && (
               <span className="rounded border border-amber-warm/50 px-1 text-[9px] uppercase tracking-wider text-amber-warm">
                 offline
               </span>

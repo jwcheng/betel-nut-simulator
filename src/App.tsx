@@ -1,5 +1,4 @@
 import { useEffect, useReducer, useState } from 'react'
-import { hasApiKey } from './api/openrouter'
 import { ActTransition } from './components/ActTransition'
 import { AIConversation } from './components/AIConversation'
 import { ChoiceList } from './components/ChoiceList'
@@ -12,6 +11,7 @@ import { StatBar } from './components/StatBar'
 import { DEFAULT_MODEL } from './config'
 import { CHARACTERS } from './game/characters'
 import { currentAct, GameContext, initialState, reducer, useGame } from './game/gameState'
+import { useAiLive } from './hooks/useAiLive'
 import { TRACKS, useBackgroundMusic } from './hooks/useBackgroundMusic'
 import roadImg from './assets/backgrounds/road.jpeg'
 import type { Character, EffectsNode, PlayerStats, SceneNode } from './types/game'
@@ -31,6 +31,7 @@ function MusicToggle({ muted, onToggle }: { muted: boolean; onToggle: () => void
 
 function StartScreen({ onStart, soundBlocked }: { onStart: () => void; soundBlocked: boolean }) {
   const [modal, setModal] = useState<'lb' | 'log' | null>(null)
+  const aiLive = useAiLive()
   return (
     <div className="absolute inset-0 z-30 flex flex-col items-center justify-center overflow-hidden px-6 text-center">
       {/* road at dusk backdrop */}
@@ -130,10 +131,10 @@ function StartScreen({ onStart, soundBlocked }: { onStart: () => void; soundBloc
       {/* footer: model credit + fiction disclaimer */}
       <div className="pointer-events-none absolute inset-x-0 bottom-3 flex flex-col items-center gap-1 px-6">
         <p className="text-[10px] text-white/45">
-          {hasApiKey ? (
+          {aiLive ? (
             <>AI dialogue live via OpenRouter · {DEFAULT_MODEL}</>
           ) : (
-            <>Offline mode — set VITE_OPENROUTER_API_KEY for live AI dialogue</>
+            <>Offline mode — NPCs answer with scripted lines</>
           )}
         </p>
         <p className="max-w-md text-center text-[9px] leading-relaxed text-white/30">
