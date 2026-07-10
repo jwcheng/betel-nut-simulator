@@ -156,7 +156,11 @@ export function reducer(state: GameState, action: Action): GameState {
           ...state.npcs,
           [action.character]: {
             ...npc,
-            history: [...npc.history, { role: 'assistant', content: action.opener }],
+            // each new encounter starts a clean transcript: previous
+            // conversations are erased, only the fresh opener remains
+            // (trust and mood carry over — people remember how you made
+            // them feel, not what you said)
+            history: [{ role: 'assistant', content: action.opener }],
           },
         },
       }
@@ -164,7 +168,23 @@ export function reducer(state: GameState, action: Action): GameState {
 
     case 'NPC_TURN': {
       const npc = state.npcs[action.character]
-      return {
+      const charName = CHARACTERS[action.character].name
+
+      // content line crossed: immediate ejection
+      if (action.reply.flag === 'offensive') {
+        return {
+          ...state,
+          phase: 'gameover',
+          gameOver: {
+            titleZh: '道上不收',
+            title: 'The Street Spits You Out',
+            text: `Some lines even this world won't cross. ${charName} goes very still, and the room goes cold around you. By morning the organization has erased your name from every ledger it keeps. The road home is the only road left.`,
+          },
+        }
+      }
+
+      const newTrust = clamp100(npc.trust + action.reply.trust_delta)
+      const next: GameState = {
         ...state,
         stats: applyEffects(state.stats, {
           charm: action.reply.charm_delta ?? 0,
@@ -174,7 +194,7 @@ export function reducer(state: GameState, action: Action): GameState {
         npcs: {
           ...state.npcs,
           [action.character]: {
-            trust: clamp100(npc.trust + action.reply.trust_delta),
+            trust: newTrust,
             mood: action.reply.mood,
             history: [
               ...npc.history,
@@ -184,6 +204,20 @@ export function reducer(state: GameState, action: Action): GameState {
           },
         },
       }
+
+      // trust bottomed out: the relationship — and the run — is over
+      if (newTrust <= 0) {
+        return {
+          ...next,
+          phase: 'gameover',
+          gameOver: {
+            titleZh: '橋斷了',
+            title: 'The Bridge Is Burned',
+            text: `${charName} is finished with you — completely. In this world, word travels faster than trucks: by morning every door in Wanxia is closed to your face. The climb ends here.`,
+          },
+        }
+      }
+      return next
     }
 
     case 'ALLY_CHECK': {

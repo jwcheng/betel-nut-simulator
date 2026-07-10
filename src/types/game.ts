@@ -23,6 +23,8 @@ export interface NPCReply {
   charm_delta?: number
   rep_delta?: number
   heat_delta?: number
+  /** 'offensive' when the player's line crosses real-world content lines */
+  flag?: string
 }
 
 export interface NPCState {
@@ -169,7 +171,13 @@ export interface Ending {
   text: string
 }
 
-export type Phase = 'start' | 'transition' | 'playing' | 'ending'
+export type Phase = 'start' | 'transition' | 'playing' | 'ending' | 'gameover'
+
+export interface GameOver {
+  titleZh: string
+  title: string
+  text: string
+}
 
 export interface GameState {
   phase: Phase
@@ -181,4 +189,5 @@ export interface GameState {
   flags: Record<string, boolean>
   log: string[]
   ending?: Ending
+  gameOver?: GameOver
 }

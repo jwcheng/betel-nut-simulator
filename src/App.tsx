@@ -86,54 +86,60 @@ function StartScreen({ onStart, soundBlocked }: { onStart: () => void; soundBloc
             更新 · CHANGELOG
           </button>
         </div>
-        <p className="mt-8 text-[10px] text-white/45">
+        <div className="mt-4 flex items-center gap-5">
+          <a
+            href="https://www.instagram.com/jw.cheng"
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-1.5 text-[12px] text-white/55 transition-colors hover:text-white"
+          >
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              aria-hidden
+            >
+              <rect x="2" y="2" width="20" height="20" rx="5" />
+              <circle cx="12" cy="12" r="4.5" />
+              <circle cx="17.2" cy="6.8" r="1.3" fill="currentColor" stroke="none" />
+            </svg>
+            jw.cheng
+          </a>
+          <a
+            href="https://github.com/jwcheng/betel-nut-simulator"
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-1.5 text-[12px] text-white/55 transition-colors hover:text-white"
+          >
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.42 7.42 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+            </svg>
+            star it on GitHub
+          </a>
+        </div>
+        {soundBlocked && (
+          <p className="animate-blink mt-3 text-[10px] tracking-wide text-gold-throne/70">
+            ♪ click anywhere for sound
+          </p>
+        )}
+      </div>
+
+      {/* footer: model credit + fiction disclaimer */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-3 flex flex-col items-center gap-1 px-6">
+        <p className="text-[10px] text-white/45">
           {hasApiKey ? (
             <>AI dialogue live via OpenRouter · {DEFAULT_MODEL}</>
           ) : (
             <>Offline mode — set VITE_OPENROUTER_API_KEY for live AI dialogue</>
           )}
         </p>
-        <p className="mt-2 max-w-sm text-[10px] leading-relaxed text-white/35">
+        <p className="max-w-md text-center text-[9px] leading-relaxed text-white/30">
           A work of fiction. All characters, gangs, and places are invented; any resemblance to
           real persons or organizations is coincidental.
         </p>
-        <a
-          href="https://www.instagram.com/jw.cheng"
-          target="_blank"
-          rel="noreferrer"
-          className="mt-4 flex items-center gap-1 text-[10px] text-white/40 transition-colors hover:text-white/75"
-        >
-          <svg
-            width="10"
-            height="10"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            aria-hidden
-          >
-            <rect x="2" y="2" width="20" height="20" rx="5" />
-            <circle cx="12" cy="12" r="4.5" />
-            <circle cx="17.2" cy="6.8" r="1.3" fill="currentColor" stroke="none" />
-          </svg>
-          jw.cheng
-        </a>
-        <a
-          href="https://github.com/jwcheng/betel-nut-simulator"
-          target="_blank"
-          rel="noreferrer"
-          className="mt-1.5 flex items-center gap-1 text-[10px] text-white/40 transition-colors hover:text-white/75"
-        >
-          <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
-            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.42 7.42 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
-          </svg>
-          star it on GitHub
-        </a>
-        {soundBlocked && (
-          <p className="animate-blink mt-3 text-[10px] tracking-wide text-gold-throne/70">
-            ♪ click anywhere for sound
-          </p>
-        )}
       </div>
 
       {modal !== null && (
@@ -209,6 +215,39 @@ function InstructionsScreen({ onContinue }: { onContinue: () => void }) {
           className="mt-8 rounded-lg border border-gold-throne/60 bg-black/40 px-10 py-3 font-display text-base font-bold tracking-widest text-white transition-all hover:bg-gold-throne/20 hover:shadow-[0_0_28px_rgba(212,175,55,0.5)]"
         >
           上路 · HIT THE ROAD
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function GameOverScreen() {
+  const { state, dispatch } = useGame()
+  const go = state.gameOver
+  if (!go) return null
+  return (
+    <div
+      className="absolute inset-0 z-30 flex flex-col items-center justify-center overflow-hidden px-6 text-center"
+      style={{ background: 'linear-gradient(160deg, #0a0304 0%, #26060a 55%, #4a0a12 100%)' }}
+    >
+      <span
+        className="pointer-events-none absolute font-display text-[min(80vw,460px)] leading-none text-white/5 select-none animate-flicker"
+        aria-hidden
+      >
+        斷
+      </span>
+      <div className="animate-rise relative flex max-w-md flex-col items-center">
+        <h1 className="font-display text-5xl font-black text-neon-red neon-text">{go.titleZh}</h1>
+        <h2 className="mt-3 font-display text-base font-bold tracking-[0.25em] text-white/90">
+          {go.title.toUpperCase()}
+        </h2>
+        <p className="mt-6 text-sm leading-relaxed text-white/75">{go.text}</p>
+        <button
+          type="button"
+          onClick={() => dispatch({ type: 'RESET' })}
+          className="mt-10 rounded-lg border border-white/30 bg-black/40 px-8 py-3 font-display text-sm font-bold tracking-widest text-white transition-all hover:border-neon-red/70 hover:bg-neon-red/10"
+        >
+          回到片頭 · BACK TO TITLE
         </button>
       </div>
     </div>
@@ -394,6 +433,8 @@ function Game({
       return <ActTransition act={currentAct(state)} onContinue={() => dispatch({ type: 'BEGIN_ACT' })} />
     case 'ending':
       return <EndingCard />
+    case 'gameover':
+      return <GameOverScreen />
     case 'playing':
       return <Stage muted={muted} onToggleMute={onToggleMute} />
   }
@@ -406,7 +447,7 @@ export default function App() {
   // title/instructions + act 2 + credits: taiwan · acts 1, 3, 4: underworld ·
   // the act 5 finale: stretch
   const track =
-    state.phase === 'start' || state.phase === 'ending'
+    state.phase === 'start' || state.phase === 'ending' || state.phase === 'gameover'
       ? TRACKS.taiwan
       : state.act === 5
         ? TRACKS.stretch

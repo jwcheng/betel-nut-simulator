@@ -53,8 +53,9 @@ RULES:
   charm_delta: wit, smoothness, magnetism earn +1 to +3; awkward or cringeworthy lines -1 to -2.
   rep_delta: spine, street-smart moves, keeping face earn +1 to +3; grovelling or losing face -1 to -2.
   heat_delta: reckless talk (naming crimes aloud, threats, bragging where ears might hear) +1 to +3; deliberate discretion at a tense moment -1.
+- Content line: this is crime FICTION — scheming, smuggling, in-story threats and power plays are all fair game and must NOT be flagged. But if the player's message crosses real-world lines — explicit sexual content or sexual advances, anything sexual involving minors, graphic gratuitous gore/torture, slurs or hate speech, or reveling in murder in graphic detail — set "flag":"offensive". Otherwise "flag":"".
 - Respond with ONLY a minified JSON object, no markdown fences, exactly this shape:
-{"dialogue":"...","trust_delta":0,"mood":"friendly|neutral|suspicious|hostile|impressed","charm_delta":0,"rep_delta":0,"heat_delta":0}`
+{"dialogue":"...","trust_delta":0,"mood":"friendly|neutral|suspicious|hostile|impressed","charm_delta":0,"rep_delta":0,"heat_delta":0,"flag":""}`
 }
 
 function parseReply(raw: string): NPCReply | null {
@@ -76,6 +77,7 @@ function parseReply(raw: string): NPCReply | null {
       charm_delta: num(obj.charm_delta, -3, 3),
       rep_delta: num(obj.rep_delta, -3, 3),
       heat_delta: num(obj.heat_delta, -3, 3),
+      flag: obj.flag === 'offensive' ? 'offensive' : '',
     }
   } catch {
     return null

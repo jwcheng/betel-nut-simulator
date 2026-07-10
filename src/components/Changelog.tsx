@@ -6,6 +6,16 @@ interface Release {
 
 const RELEASES: Release[] = [
   {
+    version: 'v0.6',
+    title: '斷 · Burned Bridges',
+    items: [
+      'Hit trust 0 with anyone and it’s over — the bridge is burned and you’re back at the title screen',
+      'The LLM now guards the content line: cross into genuinely offensive territory (explicit sexual content, slurs, gratuitous gore) and the street spits you out. In-story crime and scheming are still fair game',
+      'Fresh transcripts: each new encounter with a character starts a clean conversation — they remember how you made them feel (trust and mood carry over), not every word you said',
+      'Title screen tidied: socials moved up top and easier to see, credits and disclaimer pinned to the bottom',
+    ],
+  },
+  {
     version: 'v0.5',
     title: '排行榜 · The Street Remembers',
     items: [
