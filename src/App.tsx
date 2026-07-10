@@ -5,6 +5,7 @@ import { AIConversation } from './components/AIConversation'
 import { ChoiceList } from './components/ChoiceList'
 import { DialogueBox } from './components/DialogueBox'
 import { EndingCard } from './components/EndingCard'
+import { ChangelogPanel } from './components/Changelog'
 import { LeaderboardPanel } from './components/Leaderboard'
 import { SceneBackground } from './components/SceneBackground'
 import { StatBar } from './components/StatBar'
@@ -29,7 +30,7 @@ function MusicToggle({ muted, onToggle }: { muted: boolean; onToggle: () => void
 }
 
 function StartScreen({ onStart, soundBlocked }: { onStart: () => void; soundBlocked: boolean }) {
-  const [showLb, setShowLb] = useState(false)
+  const [modal, setModal] = useState<'lb' | 'log' | null>(null)
   return (
     <div className="absolute inset-0 z-30 flex flex-col items-center justify-center overflow-hidden px-6 text-center">
       {/* road at dusk backdrop */}
@@ -69,13 +70,22 @@ function StartScreen({ onStart, soundBlocked }: { onStart: () => void; soundBloc
         >
           開始 · START
         </button>
-        <button
-          type="button"
-          onClick={() => setShowLb(true)}
-          className="mt-3 rounded-lg border border-white/20 bg-black/30 px-5 py-1.5 text-[11px] font-bold tracking-widest text-white/60 transition-all hover:border-gold-throne/60 hover:text-white"
-        >
-          排行榜 · LEADERBOARD
-        </button>
+        <div className="mt-3 flex gap-2">
+          <button
+            type="button"
+            onClick={() => setModal('lb')}
+            className="rounded-lg border border-white/20 bg-black/30 px-5 py-1.5 text-[11px] font-bold tracking-widest text-white/60 transition-all hover:border-gold-throne/60 hover:text-white"
+          >
+            排行榜 · LEADERBOARD
+          </button>
+          <button
+            type="button"
+            onClick={() => setModal('log')}
+            className="rounded-lg border border-white/20 bg-black/30 px-5 py-1.5 text-[11px] font-bold tracking-widest text-white/60 transition-all hover:border-gold-throne/60 hover:text-white"
+          >
+            更新 · CHANGELOG
+          </button>
+        </div>
         <p className="mt-8 text-[10px] text-white/45">
           {hasApiKey ? (
             <>AI dialogue live via OpenRouter · {DEFAULT_MODEL}</>
@@ -126,19 +136,19 @@ function StartScreen({ onStart, soundBlocked }: { onStart: () => void; soundBloc
         )}
       </div>
 
-      {showLb && (
+      {modal !== null && (
         <div
           className="absolute inset-0 z-40 flex items-center justify-center bg-black/70 p-5 backdrop-blur-sm"
-          onClick={() => setShowLb(false)}
+          onClick={() => setModal(null)}
         >
           <div
             className="animate-rise w-full max-w-md"
             onClick={(e) => e.stopPropagation()}
           >
-            <LeaderboardPanel />
+            {modal === 'lb' ? <LeaderboardPanel /> : <ChangelogPanel />}
             <button
               type="button"
-              onClick={() => setShowLb(false)}
+              onClick={() => setModal(null)}
               className="mt-3 w-full rounded-lg border border-white/20 bg-black/40 px-5 py-2 text-xs font-bold tracking-widest text-white/70 transition-all hover:border-gold-throne/60 hover:text-white"
             >
               CLOSE

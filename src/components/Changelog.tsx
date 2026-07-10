@@ -1,0 +1,91 @@
+interface Release {
+  version: string
+  title: string
+  items: string[]
+}
+
+const RELEASES: Release[] = [
+  {
+    version: 'v0.5',
+    title: '排行榜 · The Street Remembers',
+    items: [
+      'Global leaderboard — carve your name after a run',
+      'Ranked by Ovr = (Cash/1000) + (Rep/2) + Charm − Heat. Playing clean beats playing rich',
+      'Viewable right here on the title screen',
+    ],
+  },
+  {
+    version: 'v0.4',
+    title: '信任 · Trust Is the Only Door',
+    items: [
+      'Minimum-exchange requirements removed — talk as little or as much as you want',
+      "Every major encounter has a clear trust gate, from Ah-Mei's easy 30 to Kuo's brutal 100",
+      'Failing a gate tells you plainly — and the conversation stays open',
+      'Reputation cap raised to 200',
+    ],
+  },
+  {
+    version: 'v0.3',
+    title: '活人 · The People Woke Up',
+    items: [
+      'Swapped the brain: dialogue now runs on DeepSeek V4 Flash via OpenRouter. (Launch model was a free-tier Llama that silently rate-limited into canned replies — fixed)',
+      'Every reply is a structured LLM verdict: the model judges your line and moves trust, mood, Charm, Rep, and Heat in a single JSON response',
+      'Characters got moodier — they reward what they respect and punish lazy or reckless talk',
+      'Hints show what each character respects and despises',
+      'English-first dialogue, with just a taste of Chinese for flavor',
+      'How-it-works screen added before Act 1',
+    ],
+  },
+  {
+    version: 'v0.2',
+    title: '有聲有色 · Sights & Sounds',
+    items: [
+      'Full manga-style art: 13 illustrated scenes and portraits for all five characters, generated to one house style',
+      'Characters now appear on screen while they speak',
+      'Three-track soundtrack that follows the story — city hustle, countryside, and a techno finale',
+      'New title screen: the road south at dusk',
+    ],
+  },
+  {
+    version: 'v0.1',
+    title: '開張 · Opening Night',
+    items: [
+      'Betel Nut Empire launches: five acts, five characters, three endings',
+      'LLM-driven from day one — every conversation is generated live. The characters read what you actually type and answer in character. Nothing they say is scripted',
+    ],
+  },
+]
+
+export function ChangelogPanel({ className = '' }: { className?: string }) {
+  return (
+    <div
+      className={`w-full rounded-xl border border-white/10 bg-black/40 p-4 text-left backdrop-blur-sm ${className}`}
+    >
+      <h3 className="font-display text-sm font-bold tracking-widest text-white/70">
+        更新 · Changelog
+      </h3>
+      <p className="mt-2 text-[11px] leading-relaxed text-gold-throne/90">
+        This is an LLM-powered game — the dialogue is generated live by a language model, so every
+        playthrough is different.
+      </p>
+      <div className="mt-3 max-h-[55vh] space-y-4 overflow-y-auto pr-1">
+        {RELEASES.map((r) => (
+          <div key={r.version}>
+            <div className="flex items-baseline gap-2">
+              <span className="font-display text-xs font-bold text-gold-throne">{r.version}</span>
+              <span className="text-xs font-bold text-white/80">{r.title}</span>
+            </div>
+            <ul className="mt-1 space-y-1">
+              {r.items.map((it, i) => (
+                <li key={i} className="pl-3 text-[11px] leading-relaxed text-white/60">
+                  <span className="text-white/30">· </span>
+                  {it}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
