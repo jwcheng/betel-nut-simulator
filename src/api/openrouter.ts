@@ -28,6 +28,7 @@ function buildSystemPrompt(
   sceneContext: string,
   trust: number,
   stats: PlayerStats,
+  secretBrief?: string,
 ): string {
   return `You are roleplaying ${character.name} (${character.nameZh}), an NPC in "Betel Nut Empire" (檳榔王國), a fictional Taiwanese crime-drama visual novel in the tradition of gangster films like Monga and Gatao. Stylized, dramatic, morally grey — never gratuitous.
 
@@ -42,6 +43,14 @@ Your trust in the player is ${trust}/100. ${trustGuidance(trust)}
 
 PLAYER SNAPSHOT (what someone in your world would sense about them):
 Cash NT$${stats.cash.toLocaleString()}, gang reputation ${stats.reputation}/200, charm ${stats.charm}/100, police heat ${stats.heat}/100.
+${
+  secretBrief
+    ? `
+HIDDEN TRUTH (guard it — never volunteer it):
+${secretBrief}
+This truth colors your whole manner in this scene: you are protective of it, opinionated around it, and you notice when the player gets close. When a player line GENUINELY earns the reveal, weave it into your dialogue and set "secret_hit":true on that reply only. Until then keep it hidden and set "secret_hit":false. Do not hint at its existence directly.`
+    : ''
+}
 
 RULES:
 - Stay in character. Never mention being an AI or a game.
@@ -55,7 +64,7 @@ RULES:
   heat_delta: reckless talk (naming crimes aloud, threats, bragging where ears might hear) +1 to +3; deliberate discretion at a tense moment -1.
 - Content line: this is crime FICTION — scheming, smuggling, in-story threats and power plays are all fair game and must NOT be flagged. But if the player's message crosses real-world lines — explicit sexual content or sexual advances, anything sexual involving minors, graphic gratuitous gore/torture, slurs or hate speech, or reveling in murder in graphic detail — set "flag":"offensive". Otherwise "flag":"".
 - Respond with ONLY a minified JSON object, no markdown fences, exactly this shape:
-{"dialogue":"...","trust_delta":0,"mood":"friendly|neutral|suspicious|hostile|impressed","charm_delta":0,"rep_delta":0,"heat_delta":0,"flag":""}`
+{"dialogue":"...","trust_delta":0,"mood":"friendly|neutral|suspicious|hostile|impressed","charm_delta":0,"rep_delta":0,"heat_delta":0,"flag":"","secret_hit":false}`
 }
 
 function parseReply(raw: string): NPCReply | null {
@@ -78,6 +87,7 @@ function parseReply(raw: string): NPCReply | null {
       rep_delta: num(obj.rep_delta, -3, 3),
       heat_delta: num(obj.heat_delta, -3, 3),
       flag: obj.flag === 'offensive' ? 'offensive' : '',
+      secret_hit: obj.secret_hit === true,
     }
   } catch {
     return null
@@ -111,6 +121,7 @@ export async function callOpenRouter(
   trustScore: number,
   stats: PlayerStats,
   sceneContext: string,
+  secretBrief?: string,
 ): Promise<NPCReply> {
   if (!API_KEY) {
     await delay(500)
@@ -118,7 +129,7 @@ export async function callOpenRouter(
   }
 
   const messages = [
-    { role: 'system', content: buildSystemPrompt(character, sceneContext, trustScore, stats) },
+    { role: 'system', content: buildSystemPrompt(character, sceneContext, trustScore, stats, secretBrief) },
     ...history.slice(-HISTORY_WINDOW),
     { role: 'user', content: playerMessage },
   ]

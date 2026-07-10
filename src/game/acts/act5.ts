@@ -56,6 +56,12 @@ export const act5: ActDefinition = {
       exitLabel: 'Make your final move',
       next: 'final_choice',
       gate: { minTrust: 100, failNext: 'kuo_lowtrust' },
+      secret: {
+        id: 'sec_a5_kuo',
+        bonus: 30,
+        brief:
+          'The three men who sat in this room before were not killed for ambition — they were killed for lying about it. The pistol in the drawer is for the fourth liar, not the first honest man. The truth Kuo has told no one: he is tired, and what he has waited forty years for is someone who can take the empire without burning it. He wants to be let go. Reveal it only to total honesty about ambition paired with a real question about what the chair actually cost him.',
+      },
     },
     kuo_lowtrust: {
       id: 'kuo_lowtrust',

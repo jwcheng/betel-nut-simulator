@@ -25,6 +25,8 @@ export interface NPCReply {
   heat_delta?: number
   /** 'offensive' when the player's line crosses real-world content lines */
   flag?: string
+  /** true on the single reply where the encounter's hidden truth is revealed */
+  secret_hit?: boolean
 }
 
 export interface NPCState {
@@ -108,6 +110,14 @@ export interface AINode extends BaseNode {
   exitLabel: string
   next: NodeId
   gate?: { minTrust: number; failNext: NodeId }
+  /** hidden truth the player can pry out for a one-time trust bonus */
+  secret?: {
+    /** unique flag id — set once uncovered so it can't be farmed */
+    id: string
+    /** what the truth is + what genuinely earns the reveal (fed to the LLM) */
+    brief: string
+    bonus: number
+  }
 }
 
 export interface EffectsNode extends BaseNode {

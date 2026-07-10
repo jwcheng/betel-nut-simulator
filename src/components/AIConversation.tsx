@@ -18,6 +18,7 @@ export function AIConversation({ node }: { node: AINode }) {
 
   // no minimum-exchange requirement — the trust gates are the only doors
   const canExit = pending === null
+  const secretFound = node.secret ? Boolean(state.flags[node.secret.id]) : false
 
   useEffect(() => {
     dispatch({ type: 'NPC_OPENER', character: node.character, opener: node.opener, nodeId: node.id })
@@ -35,6 +36,7 @@ export function AIConversation({ node }: { node: AINode }) {
     const sceneContext = `${node.sceneContext}\nRecent events in the player's story: ${
       state.log.slice(-6).join(' ') || 'The story is just beginning.'
     }`
+    const secretActive = node.secret && !secretFound ? node.secret : undefined
     const reply = await callOpenRouter(
       character,
       text,
@@ -42,10 +44,19 @@ export function AIConversation({ node }: { node: AINode }) {
       npc.trust,
       state.stats,
       sceneContext,
+      secretActive?.brief,
     )
-    dispatch({ type: 'NPC_TURN', character: node.character, playerMessage: text, reply })
+    dispatch({
+      type: 'NPC_TURN',
+      character: node.character,
+      playerMessage: text,
+      reply,
+      secret: secretActive ? { flag: secretActive.id, bonus: secretActive.bonus } : undefined,
+    })
     const fx: { label: string; bad: boolean }[] = []
     const sign = (n: number) => (n > 0 ? `+${n}` : `${n}`)
+    if (reply.secret_hit && secretActive)
+      fx.push({ label: `秘密 SECRET UNCOVERED +${secretActive.bonus} trust`, bad: false })
     if (reply.charm_delta) fx.push({ label: `${sign(reply.charm_delta)} Charm`, bad: reply.charm_delta < 0 })
     if (reply.rep_delta) fx.push({ label: `${sign(reply.rep_delta)} Rep`, bad: reply.rep_delta < 0 })
     if (reply.heat_delta) fx.push({ label: `${sign(reply.heat_delta)} Heat`, bad: reply.heat_delta > 0 })
@@ -101,6 +112,17 @@ export function AIConversation({ node }: { node: AINode }) {
           <p className="mt-0.5 text-[10px] italic leading-tight text-white/45">
             {character.hint}
           </p>
+          {node.secret && (
+            <p
+              className={`mt-0.5 text-[10px] leading-tight ${
+                secretFound ? 'text-gold-throne/80' : 'text-white/35'
+              }`}
+            >
+              {secretFound
+                ? '🔍 秘密 · secret uncovered'
+                : '🔍 an untold truth hides in this conversation'}
+            </p>
+          )}
         </div>
       </div>
 

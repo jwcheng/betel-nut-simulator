@@ -6,6 +6,16 @@ interface Release {
 
 const RELEASES: Release[] = [
   {
+    version: 'v0.7',
+    title: '秘密 · Every Conversation Hides a Truth',
+    items: [
+      'All 12 encounters now hide a secret — a truth to pry out of the character by steering the conversation the right way',
+      'Uncover one for a big one-time trust bonus (+16 to +30) — the LLM itself judges the moment the reveal is genuinely earned',
+      'A 🔍 marker in the chat shows when an untold truth remains — dig instead of repeating yourself',
+      'Characters carry deeper backstories now (homes they miss, thrones they refused, ledgers they keep) and guard them with opinions',
+    ],
+  },
+  {
     version: 'v0.6',
     title: '斷 · Burned Bridges',
     items: [

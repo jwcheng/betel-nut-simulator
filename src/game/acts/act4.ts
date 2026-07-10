@@ -92,6 +92,12 @@ export const act4: ActDefinition = {
       exitLabel: 'Finish the tea',
       next: 'ahmei_intro',
       gate: { minTrust: 60, failNext: 'hsu_lowtrust' },
+      secret: {
+        id: 'sec_a4_hsu',
+        bonus: 20,
+        brief:
+          "Hsu's faction is all lieutenants and scooter kids — he has NO transport. Without the player's trucks he cannot move a single crate, and every drop of his charm is cover for that need. If the player presses hard on concrete numbers — how many drivers he actually has, who moves his product tomorrow — he slips, then covers with a wider smile. Reveal only under that specific pressure; vague challenges he deflects easily.",
+      },
     },
     hsu_lowtrust: {
       id: 'hsu_lowtrust',
@@ -122,6 +128,12 @@ export const act4: ActDefinition = {
       exitLabel: 'Buy the pack and go',
       next: 'ahmei_ally_check',
       gate: { minTrust: 50, failNext: 'ahmei4_lowtrust' },
+      secret: {
+        id: 'sec_a4_ledger',
+        bonus: 20,
+        brief:
+          "Ah-Mei keeps a dated ledger — years of it. Every cop car, courier, and lieutenant's plate her girls have ever clocked in Wanxia, written down. It exists because a betel nut beauty with no protection needs insurance. She has never told anyone. Reveal it only to real concern for her safety that doesn't smell like pity, combined with a direct question about what she actually does with everything her girls see.",
+      },
     },
     ahmei4_lowtrust: {
       id: 'ahmei4_lowtrust',
@@ -161,6 +173,12 @@ export const act4: ActDefinition = {
       exitLabel: 'Let him read you',
       next: 'long_ally_check',
       gate: { minTrust: 100, failNext: 'long4_lowtrust' },
+      secret: {
+        id: 'sec_a4_condition',
+        bonus: 24,
+        brief:
+          "Long's unspoken condition, never said aloud to anyone: he will stand with the player only if the farms and the drivers are protected no matter who wins — and if the player ever becomes another Kuo, Long will remove him personally. He states it as plain fact, not a threat. Reveal it only when the player lays out, unprompted, a genuine plan for the working people — the farms, the drivers, the stands.",
+      },
     },
     long4_lowtrust: {
       id: 'long4_lowtrust',
@@ -217,6 +235,12 @@ export const act4: ActDefinition = {
       minTurns: 1,
       exitLabel: 'Kill the bottle',
       next: 'hub_long_check',
+      secret: {
+        id: 'sec_a4_kaoliang',
+        bonus: 16,
+        brief:
+          'Long never drinks north-brewed kaoliang. He poured it once, for a toast, the night the last succession attempt failed — and the man he toasted was dead by morning. He has drunk southern rice wine ever since. Reveal it only in the quiet of shared drinking, if the player notices what he drinks or asks about the old days.',
+      },
     },
     hub_long_check: {
       id: 'hub_long_check',
@@ -243,6 +267,12 @@ export const act4: ActDefinition = {
       minTurns: 1,
       exitLabel: 'Leave before her girls start a rumor',
       next: 'hub_ahmei_check',
+      secret: {
+        id: 'sec_a4_crates',
+        bonus: 16,
+        brief:
+          "Tonight one of her girls photographed Kuo's own men moving crates OUT of the district, quietly, before dawn. The old man is consolidating — pulling assets in tight, the way a man does before a storm he intends to survive. Reveal it only if the player asks specifically what her girls saw tonight.",
+      },
     },
     hub_ahmei_check: {
       id: 'hub_ahmei_check',
@@ -269,6 +299,12 @@ export const act4: ActDefinition = {
       minTurns: 1,
       exitLabel: 'Leave the tea unfinished',
       next: 'hub',
+      secret: {
+        id: 'sec_a4_clause',
+        bonus: 16,
+        brief:
+          "The 'improved' offer hides a clause Hsu presents as a favor: the day after the move, the player's drivers answer to Hsu's cousin — the trucks stay, the control goes. Reveal it (smiling, as though it were generosity) only if the player asks exactly what happens to his drivers and his routes after the move.",
+      },
     },
     pivotal_intro: {
       id: 'pivotal_intro',

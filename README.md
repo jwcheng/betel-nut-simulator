@@ -59,6 +59,8 @@ Player stats: **Cash** (NT$), **Reputation** (caps at 200), **Charm**, **Heat** 
 
 Trust gates per encounter: Ah-Mei 30 → Long 35 → Tsai 55 → Long 70 → Long 90 → Hsu 60 / Ah-Mei 50 / Long 100 (Act 4) → Kuo 100. Failing a gate shows a low-trust notice and reopens the conversation. Endings branch on final stats: **Bloody Coup**, **Negotiated Succession**, or **Betrayed and Cast Out**.
 
+Every AI encounter also hides a **secret** (`secret` on the AI node): a hidden truth injected into the system prompt that the character guards until the player's line genuinely earns the reveal — the model flags that moment via `secret_hit` for a one-time trust bonus (+16 to +30). Two fail states end a run outright: any character's trust hitting 0, or the model flagging genuinely offensive player input.
+
 ## Leaderboard
 
 Global, ranked by **Ovr** (overall score): `Ovr = (Cash/1000) + (Rep/2) + Charm − Heat`, computed server-side. Cash, rep, charm, and heat are all recorded and shown. Visible from the title screen (排行榜 button) and the ending screen, where you can carve your name after a run.

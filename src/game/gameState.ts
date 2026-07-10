@@ -44,7 +44,14 @@ export type Action =
   | { type: 'CHOOSE'; option: ChoiceOption }
   | { type: 'APPLY_EFFECTS'; nodeId: NodeId; effects: Partial<PlayerStats>; logLine?: string; next: NodeId }
   | { type: 'NPC_OPENER'; character: CharacterId; opener: string; nodeId: NodeId }
-  | { type: 'NPC_TURN'; character: CharacterId; playerMessage: string; reply: NPCReply }
+  | {
+      type: 'NPC_TURN'
+      character: CharacterId
+      playerMessage: string
+      reply: NPCReply
+      /** the node's secret, passed only while still undiscovered */
+      secret?: { flag: string; bonus: number }
+    }
   | { type: 'ALLY_CHECK'; node: AllyCheckNode }
   | { type: 'END_ACT' }
   | { type: 'RESET' }
@@ -183,7 +190,13 @@ export function reducer(state: GameState, action: Action): GameState {
         }
       }
 
-      const newTrust = clamp100(npc.trust + action.reply.trust_delta)
+      // one-time secret bonus: only while the flag is unset
+      const secretHit = Boolean(
+        action.reply.secret_hit && action.secret && !state.flags[action.secret.flag],
+      )
+      const secretBonus = secretHit && action.secret ? action.secret.bonus : 0
+
+      const newTrust = clamp100(npc.trust + action.reply.trust_delta + secretBonus)
       const next: GameState = {
         ...state,
         stats: applyEffects(state.stats, {
@@ -191,6 +204,13 @@ export function reducer(state: GameState, action: Action): GameState {
           reputation: action.reply.rep_delta ?? 0,
           heat: action.reply.heat_delta ?? 0,
         }),
+        flags:
+          secretHit && action.secret
+            ? { ...state.flags, [action.secret.flag]: true }
+            : state.flags,
+        log: secretHit
+          ? [...state.log, `Uncovered ${charName}'s secret.`]
+          : state.log,
         npcs: {
           ...state.npcs,
           [action.character]: {

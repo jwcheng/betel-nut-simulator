@@ -232,6 +232,12 @@ export const act2: ActDefinition = {
       exitLabel: 'Let him weigh you',
       next: 'ceremony',
       gate: { minTrust: 55, failNext: 'tsai_reject' },
+      secret: {
+        id: 'sec_a2_tsai',
+        bonus: 20,
+        brief:
+          "Kuo's collectors raise Tsai's quota every season, and Tsai has been quietly shorting shipments to keep the farm alive. He is ashamed and afraid — the last city man who learned this tried to use it against him. This pressure from the top is the real root of the coming rift in the organization. Reveal it only to someone who has sweated in his rows and asks about the numbers, the harvest pressure, or why the old workers look worried — with respect, not interrogation.",
+      },
     },
     tsai_reject: {
       id: 'tsai_reject',

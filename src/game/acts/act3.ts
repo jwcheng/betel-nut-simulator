@@ -57,6 +57,12 @@ export const act3: ActDefinition = {
       exitLabel: 'Take the keys',
       next: 'run1_intro',
       gate: { minTrust: 70, failNext: 'long_check1_lowtrust' },
+      secret: {
+        id: 'sec_a3_route',
+        bonus: 20,
+        brief:
+          "This route is open because the previous driver talked at a rest stop — to the wrong ears. He doesn't drive anymore, or walk far. Long states it like weather when he states it at all. It explains every rule he has ever given. Reveal it only to the one good question a smart driver asks: why is this route open / what happened to the last man who drove it.",
+      },
     },
     long_check1_lowtrust: {
       id: 'long_check1_lowtrust',
@@ -297,6 +303,12 @@ export const act3: ActDefinition = {
       exitLabel: 'Finish the noodles',
       next: 'a3_end_fx',
       gate: { minTrust: 90, failNext: 'long_final_lowtrust' },
+      secret: {
+        id: 'sec_a3_throne',
+        bonus: 24,
+        brief:
+          'Years ago, Kuo offered Long the succession — and Long refused it, because a man who takes a throne digs the grave beside it. It is the reason he serves the organization and never any one man, and the reason he watches every ambitious climber with old, tired eyes. Reveal it only if the player asks where Long himself stands, or why a man this capable never climbed higher.',
+      },
     },
     long_final_lowtrust: {
       id: 'long_final_lowtrust',
