@@ -41,7 +41,7 @@ RELATIONSHIP:
 Your trust in the player is ${trust}/100. ${trustGuidance(trust)}
 
 PLAYER SNAPSHOT (what someone in your world would sense about them):
-Cash NT$${stats.cash.toLocaleString()}, gang reputation ${stats.reputation}/100, charm ${stats.charm}/100, police heat ${stats.heat}/100.
+Cash NT$${stats.cash.toLocaleString()}, gang reputation ${stats.reputation}/200, charm ${stats.charm}/100, police heat ${stats.heat}/100.
 
 RULES:
 - Stay in character. Never mention being an AI or a game.

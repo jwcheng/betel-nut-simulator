@@ -10,12 +10,17 @@ const MAX_ENTRIES = 500
 
 interface Entry {
   n: string // name
-  c: number // cash (rank key)
+  c: number // cash
   r: number // reputation
   ch: number // charm
   h: number // heat
+  o: number // overall — (cash/1000) + (rep/2) + charm - heat; the rank key
   e: string // ending id
   t: number // timestamp
+}
+
+function ovr(cash: number, rep: number, charm: number, heat: number): number {
+  return Math.round((cash / 1000 + rep / 2 + charm - heat) * 10) / 10
 }
 
 function toEntry(raw: unknown): Entry | null {
@@ -48,16 +53,21 @@ export default async function handler(req: any, res: any) {
         const n = Number(v)
         return Number.isFinite(n) ? Math.max(0, Math.min(1_000_000_000, Math.round(n))) : 0
       }
+      const c = num(b.cash)
+      const r = num(b.reputation)
+      const ch = num(b.charm)
+      const h = num(b.heat)
       const entry: Entry = {
         n: name,
-        c: num(b.cash),
-        r: num(b.reputation),
-        ch: num(b.charm),
-        h: num(b.heat),
+        c,
+        r,
+        ch,
+        h,
+        o: ovr(c, r, ch, h), // computed server-side; ignore anything the client claims
         e: String(b.ending ?? '').slice(0, 24),
         t: Date.now(),
       }
-      await redis.zadd(KEY, { score: entry.c, member: JSON.stringify(entry) })
+      await redis.zadd(KEY, { score: entry.o, member: JSON.stringify(entry) })
       // keep the set bounded: drop everything below the top MAX_ENTRIES
       await redis.zremrangebyrank(KEY, 0, -(MAX_ENTRIES + 1))
       return res.status(200).json({ ok: true })

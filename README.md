@@ -55,18 +55,18 @@ src/
                          Leaderboard.
 ```
 
-Player stats: **Cash** (NT$, leaderboard rank), **Reputation**, **Charm**, **Heat**. Scripted choices move them — and so does the AI: every chat line is judged for small charm/rep/heat deltas alongside trust.
+Player stats: **Cash** (NT$), **Reputation** (caps at 200), **Charm**, **Heat** (cap at 100). Scripted choices move them — and so does the AI: every chat line is judged for small charm/rep/heat deltas alongside trust.
 
 Trust gates per encounter: Ah-Mei 30 → Long 35 → Tsai 55 → Long 70 → Long 90 → Hsu 60 / Ah-Mei 50 / Long 100 (Act 4) → Kuo 100. Failing a gate shows a low-trust notice and reopens the conversation. Endings branch on final stats: **Bloody Coup**, **Negotiated Succession**, or **Betrayed and Cast Out**.
 
 ## Leaderboard
 
-Global, ranked by **cash**, with rep/charm/heat recorded alongside. Visible from the title screen (排行榜 button) and the ending screen, where you can carve your name after a run.
+Global, ranked by **Ovr** (overall score): `Ovr = (Cash/1000) + (Rep/2) + Charm − Heat`, computed server-side. Cash, rep, charm, and heat are all recorded and shown. Visible from the title screen (排行榜 button) and the ending screen, where you can carve your name after a run.
 
 How it works:
 
-- **Storage:** an Upstash Redis sorted set (key `lb`), provisioned free through the Vercel Marketplace and attached to this project. Score = cash; the member is a JSON blob `{n, c, r, ch, h, e, t}` (name, cash, rep, charm, heat, ending id, timestamp). The set is trimmed to the top 500 on every write.
-- **API:** `api/leaderboard.ts`, one serverless endpoint. `GET` returns the top 50 (client shows 10). `POST` validates and clamps input (name ≤ 20 chars, HTML stripped, numbers bounded) and `ZADD`s the entry. Reads the `KV_REST_API_URL` / `KV_REST_API_TOKEN` env vars that the Upstash integration injects.
+- **Storage:** an Upstash Redis sorted set (key `lb`), provisioned free through the Vercel Marketplace and attached to this project. Score = Ovr; the member is a JSON blob `{n, c, r, ch, h, o, e, t}` (name, cash, rep, charm, heat, ovr, ending id, timestamp). The set is trimmed to the top 500 on every write.
+- **API:** `api/leaderboard.ts`, one serverless endpoint. `GET` returns the top 50 (client shows 10). `POST` validates and clamps input (name ≤ 20 chars, HTML stripped, numbers bounded), computes Ovr from the submitted stats, and `ZADD`s the entry. Reads the `KV_REST_API_URL` / `KV_REST_API_TOKEN` env vars that the Upstash integration injects.
 - **Client:** `src/components/Leaderboard.tsx` — one shared panel; the ending screen passes `allowSubmit` to add the name form.
 - **Honesty note:** scores are submitted from the browser, so they're spoofable with dev tools. It's a fun-run leaderboard, not an anti-cheat system.
 

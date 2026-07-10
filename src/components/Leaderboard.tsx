@@ -7,8 +7,14 @@ export interface LbEntry {
   r: number
   ch: number
   h: number
+  o?: number
   e: string
   t: number
+}
+
+/** overall score — computed for entries recorded before the Ovr era */
+function ovrOf(e: LbEntry): number {
+  return e.o ?? Math.round((e.c / 1000 + e.r / 2 + e.ch - e.h) * 10) / 10
 }
 
 /**
@@ -128,6 +134,7 @@ export function LeaderboardPanel({
                 <th className="pr-2 font-normal">#</th>
                 <th className="pr-2 font-normal">Name</th>
                 <th className="pr-2 text-right font-normal">Cash</th>
+                <th className="pr-2 text-right font-normal">Ovr</th>
                 <th className="pr-2 text-right font-normal">Rep</th>
                 <th className="pr-2 text-right font-normal">Charm</th>
                 <th className="text-right font-normal">Heat</th>
@@ -141,6 +148,7 @@ export function LeaderboardPanel({
                     <td className="pr-2">{i + 1}</td>
                     <td className="max-w-[10rem] truncate pr-2">{e.n}</td>
                     <td className="pr-2 text-right">NT${e.c.toLocaleString()}</td>
+                    <td className="pr-2 text-right font-bold">{ovrOf(e)}</td>
                     <td className="pr-2 text-right">{e.r}</td>
                     <td className="pr-2 text-right">{e.ch}</td>
                     <td className="text-right">{e.h}</td>

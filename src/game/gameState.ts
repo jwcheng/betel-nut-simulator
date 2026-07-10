@@ -54,7 +54,8 @@ const clamp100 = (n: number) => Math.max(0, Math.min(100, n))
 function applyEffects(stats: PlayerStats, fx: Partial<PlayerStats>): PlayerStats {
   return {
     cash: Math.max(0, stats.cash + (fx.cash ?? 0)),
-    reputation: clamp100(stats.reputation + (fx.reputation ?? 0)),
+    // reputation runs to 200; the rest cap at 100
+    reputation: Math.max(0, Math.min(200, stats.reputation + (fx.reputation ?? 0))),
     charm: clamp100(stats.charm + (fx.charm ?? 0)),
     heat: clamp100(stats.heat + (fx.heat ?? 0)),
   }
