@@ -205,6 +205,12 @@ function InstructionsScreen({ onContinue }: { onContinue: () => void }) {
             hint under their name tells you what they respect — and despise.
           </p>
           <p>
+            <span className="font-bold text-gold-throne">Every conversation hides a secret.</span>{' '}
+            A 🔍 marker means an untold truth is buried in the encounter — its reward is listed
+            right next to it. Steer the talk toward it, or just ask directly. Big trust and stat
+            payoffs for those who dig.
+          </p>
+          <p>
             <span className="font-bold text-gold-throne">Watch your stats.</span> Choices move
             Cash 現金, Reputation 聲望, Charm 魅力, and Heat 風聲. Some paths need minimums — and
             Heat is police attention. Allies you win along the way will count at the end.

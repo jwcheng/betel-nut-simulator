@@ -6,6 +6,16 @@ interface Release {
 
 const RELEASES: Release[] = [
   {
+    version: 'v0.11',
+    title: '挖 · Worth Digging For',
+    items: [
+      'Every secret shows its price tag now — next to the 🔍 hint in the conversation, on the how-to-play screen, and in the endgame secrets table',
+      'Asking a character point-blank about their secret finally works — a sincere, on-topic question earns the reveal, no more vault-cracking',
+      'Leave a truth buried too long and the suggestion chips start digging for you — one will steer toward the secret',
+      'Trust judge rebalanced: ordinary lines earn nothing, great lines pay up to +15, bad lines cost up to -15. Earn it — or watch it swing',
+    ],
+  },
+  {
     version: 'v0.10',
     title: '無頂 · The Ceiling Comes Off',
     items: [

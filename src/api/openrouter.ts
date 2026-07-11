@@ -38,6 +38,7 @@ function buildSystemPrompt(
   trust: number,
   stats: PlayerStats,
   secretBrief?: string,
+  steerToSecret?: boolean,
 ): string {
   return `You are roleplaying ${character.name} (${character.nameZh}), an NPC in "Betel Nut Empire" (檳榔王國), a fictional Taiwanese crime-drama visual novel in the tradition of gangster films like Monga and Gatao. Stylized, dramatic, morally grey — never gratuitous.
 
@@ -57,7 +58,7 @@ ${
     ? `
 HIDDEN TRUTH (guard it — never volunteer it):
 ${secretBrief}
-This truth colors your whole manner in this scene: you are protective of it, opinionated around it, and you notice when the player gets close. When a player line GENUINELY earns the reveal, weave it into your dialogue and set "secret_hit":true on that reply only. Until then keep it hidden and set "secret_hit":false. Do not hint at its existence directly.`
+This truth colors your whole manner in this scene: you are protective of it, opinionated around it, and you notice when the player gets close. The brief describes the ideal key, but do not be a locked vault: a DIRECT, sincere question on this subject earns the reveal even if imperfectly worded — never deflect a genuine on-topic ask twice. When you reveal it, weave it into your dialogue and set "secret_hit":true on that reply only. Until then keep it hidden and set "secret_hit":false, and do not hint at its existence directly.`
     : ''
 }
 
@@ -66,14 +67,18 @@ RULES:
 - Reply in ENGLISH. You may sprinkle in AT MOST one or two short Traditional Chinese or Taiwanese words per reply (e.g. 哎唷, 兄弟, 少年仔) for flavor — NEVER write a full Chinese sentence or clause. English speakers must understand every reply completely without translation.
 - If the player asks you to speak English (or says they don't understand Chinese), drop the Chinese words entirely and reply in plain English from then on.
 - 1 to 4 sentences MAXIMUM. Punchy, filmic visual-novel dialogue, not prose.
-- Judge the player's line and set trust_delta. A sincere, in-character line that fits what you respect earns +5 to +9. A passable line earns +1 to +3. But you are MOODY: lazy, repetitive, evasive, or try-hard lines COST trust (-2 to -5), and lines you genuinely despise cost -6 to -10. Let your mood swing visibly — flash suspicious or hostile the moment something lands wrong, warm quickly when something lands right.
+- Judge the player's line and set trust_delta. Be a HARSH, even-handed judge — over a conversation roughly a third of lines should land positive, a third neutral (0), a third negative. Ordinary, safe, or merely pleasant lines are worth 0: trust is EARNED, never accumulated by just talking. A line that genuinely hits what you respect: +5 to +10; one that truly impresses you: +11 to +15 (rare). Lazy, repetitive, evasive, or try-hard lines: -5 to -10; lines you genuinely despise: -11 to -15. Let your mood swing visibly with the number — flash suspicious or hostile the moment something lands wrong, warm quickly when something lands right.
 - Also judge small stat effects, each -3 to +3 and usually 0 — set them ONLY when the line clearly earns it:
   charm_delta: wit, smoothness, magnetism earn +1 to +3; awkward or cringeworthy lines -1 to -2.
   rep_delta: spine, street-smart moves, keeping face earn +1 to +3; grovelling or losing face -1 to -2.
   heat_delta: reckless talk (naming crimes aloud, threats, bragging where ears might hear) +1 to +3; deliberate discretion at a tense moment -1.
 - Content line: this is crime FICTION — scheming, smuggling, in-story threats and power plays are all fair game and must NOT be flagged. But if the player's message crosses real-world lines — explicit sexual content or sexual advances, anything sexual involving minors, graphic gratuitous gore/torture, slurs or hate speech, or reveling in murder in graphic detail — set "flag":"offensive". Otherwise "flag":"".
 - "wrap": set true ONLY when this scene's business is genuinely settled from your side — a deal struck, instructions given, an understanding reached — and you would naturally end the conversation here on good terms. Never wrap in your first couple of replies, never while you still distrust the player, and never as a brush-off.
-- "suggestion": write ONE fresh line the PLAYER could say next — first person, the player's voice, under 120 characters — that would genuinely move THIS conversation somewhere new. Never repeat anything already said or suggested.
+- "suggestion": write ONE fresh line the PLAYER could say next — first person, the player's voice, under 120 characters — that would genuinely move THIS conversation somewhere new. Never repeat anything already said or suggested.${
+    steerToSecret
+      ? ' The hidden truth is still buried: make this suggestion a line that would genuinely draw you toward revealing it — a question or approach that fits the reveal condition in the brief.'
+      : ''
+  }
 - Respond with ONLY a minified JSON object, no markdown fences, exactly this shape:
 {"dialogue":"...","trust_delta":0,"mood":"friendly|neutral|suspicious|hostile|impressed","charm_delta":0,"rep_delta":0,"heat_delta":0,"flag":"","secret_hit":false,"wrap":false,"suggestion":"..."}`
 }
@@ -92,7 +97,7 @@ function parseReply(raw: string): NPCReply | null {
     const mood = VALID_MOODS.includes(obj.mood as Mood) ? (obj.mood as Mood) : 'neutral'
     return {
       dialogue: obj.dialogue,
-      trust_delta: num(obj.trust_delta, -10, 10),
+      trust_delta: num(obj.trust_delta, -15, 15),
       mood,
       charm_delta: num(obj.charm_delta, -3, 3),
       rep_delta: num(obj.rep_delta, -3, 3),
@@ -136,6 +141,7 @@ export async function callOpenRouter(
   stats: PlayerStats,
   sceneContext: string,
   secretBrief?: string,
+  steerToSecret?: boolean,
 ): Promise<NPCReply> {
   if (!(await checkAiLive())) {
     await delay(500)
@@ -143,7 +149,7 @@ export async function callOpenRouter(
   }
 
   const messages = [
-    { role: 'system', content: buildSystemPrompt(character, sceneContext, trustScore, stats, secretBrief) },
+    { role: 'system', content: buildSystemPrompt(character, sceneContext, trustScore, stats, secretBrief, steerToSecret) },
     ...history.slice(-HISTORY_WINDOW),
     { role: 'user', content: playerMessage },
   ]

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { callOpenRouter } from '../api/openrouter'
 import { CHARACTERS } from '../game/characters'
 import { useGame } from '../game/gameState'
+import { secretWorth } from '../game/secrets'
 import { useAiLive } from '../hooks/useAiLive'
 import type { AINode } from '../types/game'
 import { Portrait } from './Portrait'
@@ -42,6 +43,9 @@ export function AIConversation({ node }: { node: AINode }) {
       state.log.slice(-6).join(' ') || 'The story is just beginning.'
     }`
     const secretActive = node.secret && !secretFound ? node.secret : undefined
+    // secret still buried after two full exchanges: the model's fresh
+    // suggestion chip starts steering the player toward it
+    const steerToSecret = Boolean(secretActive) && npc.history.length >= 5
     const reply = await callOpenRouter(
       character,
       text,
@@ -50,6 +54,7 @@ export function AIConversation({ node }: { node: AINode }) {
       state.stats,
       sceneContext,
       secretActive?.brief,
+      steerToSecret,
     )
     dispatch({
       type: 'NPC_TURN',
@@ -64,8 +69,13 @@ export function AIConversation({ node }: { node: AINode }) {
     // keep exactly 3 chips alive: drop the used one, prefer the model's fresh
     // suggestion, and recycle originals if the fresh one is empty/duplicate
     setChips((prev) => {
-      const next = usedChip ? prev.filter((c) => c !== usedChip) : [...prev]
+      let next = usedChip ? prev.filter((c) => c !== usedChip) : [...prev]
       const fresh = (reply.suggestion ?? '').trim()
+      // steering mode: the fresh chip leads toward the secret, so retire the
+      // oldest chip to guarantee it a slot even when the player typed manually
+      if (steerToSecret && !reply.secret_hit && !usedChip && next.length >= 3 && fresh.length > 4 && !next.includes(fresh)) {
+        next = next.slice(1)
+      }
       if (next.length < 3 && fresh.length > 4 && !next.includes(fresh)) next.push(fresh)
       for (const orig of node.suggestions) {
         if (next.length >= 3) break
@@ -148,7 +158,7 @@ export function AIConversation({ node }: { node: AINode }) {
             >
               {secretFound
                 ? '🔍 秘密 · secret uncovered'
-                : '🔍 an untold truth hides in this conversation'}
+                : `🔍 an untold truth hides here — worth ${secretWorth(node.secret.bonus, node.secret.effects)}`}
             </p>
           )}
         </div>
