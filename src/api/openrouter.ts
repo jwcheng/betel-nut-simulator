@@ -56,9 +56,14 @@ Cash NT$${stats.cash.toLocaleString()}, gang reputation ${stats.reputation}/200,
 ${
   secretBrief
     ? `
-HIDDEN TRUTH (guard it — never volunteer it):
+HIDDEN TRUTH (never volunteer it unprompted):
 ${secretBrief}
-This truth colors your whole manner in this scene: you are protective of it, opinionated around it, and you notice when the player gets close. The brief describes the ideal key, but do not be a locked vault: a DIRECT, sincere question on this subject earns the reveal even if imperfectly worded — never deflect a genuine on-topic ask twice. When you reveal it, weave it into your dialogue and set "secret_hit":true on that reply only. Until then keep it hidden and set "secret_hit":false, and do not hint at its existence directly.`
+This truth colors your whole manner in this scene: you are protective of it, opinionated around it, and you notice when the player gets close.
+REVEAL RULES — check in this order:
+1. The player's message directly asks about or names the SUBJECT of this truth — even bluntly, clumsily, or partially → REVEAL IT NOW in this reply. A direct on-topic ask always wins; the "reveal only..." wording in the brief governs indirect approaches and NEVER blocks a direct question. (A generic fishing line like "what's your secret?" with no subject does not count.)
+2. The message meets the reveal condition described in the brief → reveal it.
+3. Neither → keep it hidden, set "secret_hit":false, and do not hint at its existence.
+Revealing means stating the truth plainly in your dialogue, in character, in THIS reply — not teasing it for later. Whenever your dialogue states the truth, you MUST set "secret_hit":true on that same reply.`
     : ''
 }
 
