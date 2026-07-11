@@ -60,6 +60,8 @@ export const act3: ActDefinition = {
       secret: {
         id: 'sec_a3_route',
         bonus: 20,
+        // you learn exactly why silence is survival — quieter on the road
+        effects: { heat: -4 },
         brief:
           "This route is open because the previous driver talked at a rest stop — to the wrong ears. He doesn't drive anymore, or walk far. Long states it like weather when he states it at all. It explains every rule he has ever given. Reveal it only to the one good question a smart driver asks: why is this route open / what happened to the last man who drove it.",
       },
@@ -306,6 +308,8 @@ export const act3: ActDefinition = {
       secret: {
         id: 'sec_a3_throne',
         bonus: 24,
+        // you now understand the true shape of power in the organization
+        effects: { reputation: 20 },
         brief:
           'Years ago, Kuo offered Long the succession — and Long refused it, because a man who takes a throne digs the grave beside it. It is the reason he serves the organization and never any one man, and the reason he watches every ambitious climber with old, tired eyes. Reveal it only if the player asks where Long himself stands, or why a man this capable never climbed higher.',
       },

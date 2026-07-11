@@ -95,6 +95,8 @@ export const act1: ActDefinition = {
       secret: {
         id: 'sec_a1_ahmei',
         bonus: 20,
+        // reaching the person behind the glass teaches you how to reach anyone
+        effects: { charm: 20 },
         brief:
           "Ah-Mei is from Binnan Township in the deep south — she sends half her pay home to her mother and little brother, and she is privately, fiercely homesick. She hides it behind jokes and sales patter. Reveal it only to genuine, respectful curiosity about HER life (not the display): where she's from, who the money is for, why she works nights. Sleaze or pity slams the door.",
       },
@@ -152,6 +154,8 @@ export const act1: ActDefinition = {
       secret: {
         id: 'sec_a1_long',
         bonus: 20,
+        // a nobody driver made it before you — you start carrying yourself like a man with a future
+        effects: { reputation: 12 },
         brief:
           'Long started exactly like the player: a nobody truck driver from nothing, southern routes, twenty years ago. It is the one soft spot he has and he never volunteers it. Reveal it only if the player talks about the road and driving like real craft — routes, hours, what the wheel does to a man over years. Flattery or probing questions get nothing.',
       },

@@ -50,7 +50,7 @@ export type Action =
       playerMessage: string
       reply: NPCReply
       /** the node's secret, passed only while still undiscovered */
-      secret?: { flag: string; bonus: number }
+      secret?: { flag: string; bonus: number; effects?: Partial<PlayerStats> }
       /** the node's gate threshold; a genuine wrap lifts trust to meet it */
       gateTarget?: number
     }
@@ -63,9 +63,9 @@ const clamp100 = (n: number) => Math.max(0, Math.min(100, n))
 function applyEffects(stats: PlayerStats, fx: Partial<PlayerStats>): PlayerStats {
   return {
     cash: Math.max(0, stats.cash + (fx.cash ?? 0)),
-    // reputation runs to 200; the rest cap at 100
-    reputation: Math.max(0, Math.min(200, stats.reputation + (fx.reputation ?? 0))),
-    charm: clamp100(stats.charm + (fx.charm ?? 0)),
+    // rep and charm have no ceiling; only heat stays 0-100
+    reputation: Math.max(0, stats.reputation + (fx.reputation ?? 0)),
+    charm: Math.max(0, stats.charm + (fx.charm ?? 0)),
     heat: clamp100(stats.heat + (fx.heat ?? 0)),
   }
 }
@@ -197,6 +197,7 @@ export function reducer(state: GameState, action: Action): GameState {
         action.reply.secret_hit && action.secret && !state.flags[action.secret.flag],
       )
       const secretBonus = secretHit && action.secret ? action.secret.bonus : 0
+      const secretFx = (secretHit && action.secret?.effects) || {}
 
       let newTrust = clamp100(npc.trust + action.reply.trust_delta + secretBonus)
       // the character closed the scene on good terms: the deal itself is the
@@ -208,9 +209,10 @@ export function reducer(state: GameState, action: Action): GameState {
       const next: GameState = {
         ...state,
         stats: applyEffects(state.stats, {
-          charm: action.reply.charm_delta ?? 0,
-          reputation: action.reply.rep_delta ?? 0,
-          heat: action.reply.heat_delta ?? 0,
+          cash: secretFx.cash ?? 0,
+          charm: (action.reply.charm_delta ?? 0) + (secretFx.charm ?? 0),
+          reputation: (action.reply.rep_delta ?? 0) + (secretFx.reputation ?? 0),
+          heat: (action.reply.heat_delta ?? 0) + (secretFx.heat ?? 0),
         }),
         flags:
           secretHit && action.secret

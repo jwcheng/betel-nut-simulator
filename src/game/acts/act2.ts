@@ -235,6 +235,8 @@ export const act2: ActDefinition = {
       secret: {
         id: 'sec_a2_tsai',
         bonus: 20,
+        // leverage at the root of the coming rift — but the last man who knew it got burned
+        effects: { reputation: 16, heat: 3 },
         brief:
           "Kuo's collectors raise Tsai's quota every season, and Tsai has been quietly shorting shipments to keep the farm alive. He is ashamed and afraid — the last city man who learned this tried to use it against him. This pressure from the top is the real root of the coming rift in the organization. Reveal it only to someone who has sweated in his rows and asks about the numbers, the harvest pressure, or why the old workers look worried — with respect, not interrogation.",
       },

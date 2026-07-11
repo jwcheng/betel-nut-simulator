@@ -59,6 +59,8 @@ export const act5: ActDefinition = {
       secret: {
         id: 'sec_a5_kuo',
         bonus: 30,
+        // the endgame is peace, not war — the whole board softens for the man who knows it
+        effects: { reputation: 20, heat: -5 },
         brief:
           'The three men who sat in this room before were not killed for ambition — they were killed for lying about it. The pistol in the drawer is for the fourth liar, not the first honest man. The truth Kuo has told no one: he is tired, and what he has waited forty years for is someone who can take the empire without burning it. He wants to be let go. Reveal it only to total honesty about ambition paired with a real question about what the chair actually cost him.',
       },

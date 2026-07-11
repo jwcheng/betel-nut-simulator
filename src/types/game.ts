@@ -121,6 +121,8 @@ export interface AINode extends BaseNode {
     /** what the truth is + what genuinely earns the reveal (fed to the LLM) */
     brief: string
     bonus: number
+    /** one-time stat fallout beyond trust — leverage, wisdom, or dangerous knowledge */
+    effects?: Partial<PlayerStats>
   }
 }
 

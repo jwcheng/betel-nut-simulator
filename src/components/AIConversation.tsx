@@ -56,7 +56,9 @@ export function AIConversation({ node }: { node: AINode }) {
       character: node.character,
       playerMessage: text,
       reply,
-      secret: secretActive ? { flag: secretActive.id, bonus: secretActive.bonus } : undefined,
+      secret: secretActive
+        ? { flag: secretActive.id, bonus: secretActive.bonus, effects: secretActive.effects }
+        : undefined,
       gateTarget: node.gate?.minTrust,
     })
     // keep exactly 3 chips alive: drop the used one, prefer the model's fresh
@@ -75,8 +77,14 @@ export function AIConversation({ node }: { node: AINode }) {
     const sign = (n: number) => (n > 0 ? `+${n}` : `${n}`)
     if (reply.wrap && node.gate && npc.trust < node.gate.minTrust)
       fx.push({ label: `成交 · DEAL SEALED — trust ${node.gate.minTrust}`, bad: false })
-    if (reply.secret_hit && secretActive)
+    if (reply.secret_hit && secretActive) {
       fx.push({ label: `秘密 SECRET UNCOVERED +${secretActive.bonus} trust`, bad: false })
+      const e = secretActive.effects ?? {}
+      if (e.cash) fx.push({ label: `${sign(e.cash)} Cash`, bad: e.cash < 0 })
+      if (e.reputation) fx.push({ label: `${sign(e.reputation)} Rep`, bad: e.reputation < 0 })
+      if (e.charm) fx.push({ label: `${sign(e.charm)} Charm`, bad: e.charm < 0 })
+      if (e.heat) fx.push({ label: `${sign(e.heat)} Heat`, bad: e.heat > 0 })
+    }
     if (reply.charm_delta) fx.push({ label: `${sign(reply.charm_delta)} Charm`, bad: reply.charm_delta < 0 })
     if (reply.rep_delta) fx.push({ label: `${sign(reply.rep_delta)} Rep`, bad: reply.rep_delta < 0 })
     if (reply.heat_delta) fx.push({ label: `${sign(reply.heat_delta)} Heat`, bad: reply.heat_delta > 0 })
@@ -188,9 +196,9 @@ export function AIConversation({ node }: { node: AINode }) {
       {/* stat effects from the last exchange */}
       {statFx.length > 0 && (
         <div className="flex flex-wrap gap-1.5 px-3 pb-1">
-          {statFx.map((f) => (
+          {statFx.map((f, i) => (
             <span
-              key={f.label}
+              key={i}
               className={`animate-rise rounded-full border px-2 py-0.5 text-[10px] font-bold ${
                 f.bad
                   ? 'border-neon-red/60 text-neon-red'
