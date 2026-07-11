@@ -6,6 +6,16 @@ interface Release {
 
 const RELEASES: Release[] = [
   {
+    version: 'v0.10',
+    title: '無頂 · The Ceiling Comes Off',
+    items: [
+      'Rep and Charm are uncapped — the climb has no ceiling now (Heat still tops out at 100)',
+      'Secrets pay out beyond trust: every hidden truth now moves your stats — big Charm and Rep rewards, dangerous knowledge adds Heat, protective intel burns it off',
+      "The exit button glows gold the moment trust clears the scene's gate — you'll know when you're ready to move on",
+      "Chat box holds one steady height instead of creeping up over the character's face, and typing on iPhone no longer zooms the page",
+    ],
+  },
+  {
     version: 'v0.9',
     title: '鎖 · The Key Goes in the Vault',
     items: [
