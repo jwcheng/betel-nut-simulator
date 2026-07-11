@@ -238,17 +238,18 @@ export function AIConversation({ node }: { node: AINode }) {
 
       {/* input + exit */}
       <div className="flex gap-2 border-t border-white/10 p-2">
+        {/* input stays enabled while a reply is pending so the player can line
+            up their next message (and the mobile keyboard stays open) */}
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Enter') send(input)
           }}
-          disabled={pending !== null}
           placeholder={`Say something to ${character.name}…`}
           // 16px font: anything smaller makes iOS Safari zoom in on focus,
           // which shrinks the page until you're done typing
-          className="min-w-0 flex-1 rounded-lg border border-white/15 bg-noir-950/80 px-3 py-2 text-base text-white placeholder-white/30 outline-none focus:border-neon-pink/70 disabled:opacity-50"
+          className="min-w-0 flex-1 rounded-lg border border-white/15 bg-noir-950/80 px-3 py-2 text-base text-white placeholder-white/30 outline-none focus:border-neon-pink/70"
         />
         <button
           type="button"

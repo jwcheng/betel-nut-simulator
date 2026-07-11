@@ -13,6 +13,7 @@ const RELEASES: Release[] = [
       'Asking a character point-blank about their secret finally works — a sincere, on-topic question earns the reveal, no more vault-cracking',
       'Leave a truth buried too long and the suggestion chips start digging for you — one will steer toward the secret',
       'Trust judge rebalanced: ordinary lines earn nothing, great lines pay up to +15, bad lines cost up to -15. Earn it — or watch it swing',
+      'Type while they talk: the input box stays open while a reply is coming, so you can line up your next move (and your phone keyboard stops closing)',
     ],
   },
   {
