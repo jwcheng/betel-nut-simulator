@@ -22,6 +22,7 @@ export function AIConversation({ node }: { node: AINode }) {
 
   // no minimum-exchange requirement — the trust gates are the only doors
   const canExit = pending === null
+  const gateCleared = !node.gate || npc.trust >= node.gate.minTrust
   const secretFound = node.secret ? Boolean(state.flags[node.secret.id]) : false
 
   useEffect(() => {
@@ -93,7 +94,7 @@ export function AIConversation({ node }: { node: AINode }) {
   }
 
   return (
-    <div className="flex w-full flex-col overflow-hidden rounded-xl border border-white/10 bg-noir-900/92 shadow-[0_8px_40px_rgba(0,0,0,0.6)] backdrop-blur-md">
+    <div className="mx-auto flex w-[90%] flex-col overflow-hidden rounded-xl border border-white/10 bg-noir-900/92 shadow-[0_8px_40px_rgba(0,0,0,0.6)] backdrop-blur-md">
       {/* header, with character art as a backdrop */}
       <div className="relative flex items-center gap-3 border-b border-white/10 px-3 py-2">
         {character.portraitUrl && (
@@ -145,8 +146,8 @@ export function AIConversation({ node }: { node: AINode }) {
         </div>
       </div>
 
-      {/* transcript */}
-      <div ref={scrollRef} className="max-h-[38vh] min-h-[16vh] overflow-y-auto px-3 py-2">
+      {/* transcript — fixed height so the box never grows over the character's face */}
+      <div ref={scrollRef} className="h-[calc(16vh_+_20px)] shrink-0 overflow-y-auto px-3 py-2">
         {npc.history.map((m, i) => (
           <div key={i} className={`mb-2 flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <p
@@ -227,7 +228,9 @@ export function AIConversation({ node }: { node: AINode }) {
           }}
           disabled={pending !== null}
           placeholder={`Say something to ${character.name}…`}
-          className="min-w-0 flex-1 rounded-lg border border-white/15 bg-noir-950/80 px-3 py-2 text-sm text-white placeholder-white/30 outline-none focus:border-neon-pink/70 disabled:opacity-50"
+          // 16px font: anything smaller makes iOS Safari zoom in on focus,
+          // which shrinks the page until you're done typing
+          className="min-w-0 flex-1 rounded-lg border border-white/15 bg-noir-950/80 px-3 py-2 text-base text-white placeholder-white/30 outline-none focus:border-neon-pink/70 disabled:opacity-50"
         />
         <button
           type="button"
@@ -241,7 +244,11 @@ export function AIConversation({ node }: { node: AINode }) {
           type="button"
           onClick={exit}
           disabled={!canExit}
-          className="rounded-lg border border-white/20 px-3 py-2 text-xs text-white/80 transition-all hover:border-gold-throne hover:text-gold-throne disabled:opacity-30"
+          className={`rounded-lg border px-3 py-2 text-xs transition-all disabled:opacity-30 ${
+            gateCleared
+              ? 'border-gold-throne bg-gold-throne/15 font-bold text-gold-throne shadow-[0_0_14px_rgba(212,175,55,0.45)]'
+              : 'border-white/20 text-white/80 hover:border-gold-throne hover:text-gold-throne'
+          }`}
         >
           {node.exitLabel}
         </button>
